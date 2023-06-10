@@ -59,5 +59,5 @@ Execution、Report等协议。使用Mud库，可以为MCU板添加IoT通讯能�
 [**概念**](./Concepts.md)<br>
 来熟悉相关概念 。<br><br>
 如果你是第一次接触使用Lithosphere，建议跟随<br>
-[**Hello系列教程**](./Hello_Tutorials.md)<br>
-来学习和熟悉Lithosphere平台的使用。
+[**Hello Lithosphere教程**](./Hello_Lithosphere_Tutorials.md)<br>
+来学习和了解Lithosphere平台的使用。
