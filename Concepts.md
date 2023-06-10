@@ -52,7 +52,7 @@ XMPP协议是一个异步消息通讯协议，在XMPP核心协议里，定义了
 * stream通道被打开后，DaveBowman发送一条message类型的stanza给右边的账号为Hal的客户端。
 * Hal读到信息之后，回复了一条message。
 * 然后DaveBowman关闭了stream通道，会话结束。
-![](./stream_and_stanza.png)
+![](https://github.com/TheFirstLineOfCode/Lithosphere/blob/main/stream_and_stanza.png)
 ### 1.4 Stanza
 当XMPP实体建立连接并打开stream后，它就可以给其它XMPP实体发送stanza类型的消息了。
 stanza是XMPP协议里进行信息交换的顶级元素。有3种类型的stanza：Message，Presence，IQ(Info/Query)。<br><br>
