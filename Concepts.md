@@ -92,7 +92,7 @@ Lithosphere平台，也主要使用IQ来实现IoT扩展协议。
 
 ## 2 Plugin-Architecture
 插件架构将系统分为两部分：内核系统、插件。<br><br>
-![](./plugin_architecture.png)
+![](https://github.com/TheFirstLineOfCode/Lithosphere/blob/main/plugin_architecture.png)
 插件架构的主要架构特征是高度模块化和极强的扩展性。<br><br>
 经过精心设计的插件系统，每个插件相互之间是相互解耦的，再加上插件在运行时才绑定到主程序，这使得它易于扩展，并可以被灵活部署。
 ### 2.1 Extension Point
