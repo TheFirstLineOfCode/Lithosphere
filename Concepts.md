@@ -121,8 +121,27 @@ XMPP的灵活性，就来这种微内核（XMPP Core、XMPP IM） + 丰富的扩
 遵循XMPP体系的设计原则，Lithosphere在所有可以采用插件架构的地方，使用插件架构，以获得绝对的灵活性和扩展性。
 
 ## 3 IoT
+简单来说，IoT就是连接万物，将物理世界所有的对象，都接入到网络之中。<br><br>
+更具体来说，IoT是我们通过各种信息传感器、射频识别技术、全球定位系统、红外感应器、激光扫描器等各种装置与技术，实时采集任何需要监控、连接、互动的物体或过程，采集其声、光、热、电、力学、化学、生物、位置等各种需要的信息，通过各类可能的网络接入，实现物与物、物与人的泛在连接，实现对物品和过程的智能化感知、识别和管理。
 
-
-### Actuator
-
+### 3.1 Sensor
+传感器（Sensor）是能够感知它周围环境的事件和变化，并将相关信息转换为输出信号的IoT设备。<br><br>
+常见的传感器如：
+* 温度传感器（Temperature sensor）
+* 湿度传感器（Moisture Sensor）
+* 光敏传感器（Light Sensor）
+* 噪声传感器（Noise Sensor）
+* ......
+### 3.2 Actuator
+执行器（Actuator）是能接受电子信号指令并根据指令执行具体物理动作的IoT设备。<br><br>
+常见的执行器分类如：
+* 电动执行器（Electric Actuators）
+* 液压执行器（Hydraulic Actuators）
+* 气动执行器（Pneumatic Actuators）
+* 热执行器（Thermal Actuators）
+* 线性执行器（Linear Actuators）
+* ......
+### 3.3 Concentrator
+在IoT系统里，集线器（Concentrator）是指可以添加和管理下级IoT设备的中心节点设备。<br><br>
+IoT网关就是典型的Concentrator设备。
 
