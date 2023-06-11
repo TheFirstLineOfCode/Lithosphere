@@ -16,7 +16,7 @@ Lithosphere IoT平台主要使用XMPP协议和插件架构技术。<br><br>
 [**Hello, LoRa!**](./Hello_LoRa_Tutorial.md)<br>
 IoT系统里，怎么能不出现IoT通讯协议呢？<br><br>
 在这篇教程里，我们来学习如何组网LoRa通讯设备。<br><br>
-我们使用一个Raspberry Pi Zeror W的板子来做LoRa通讯网关。当然，我们可以使用LoRa Gateway插件来简化网关的开发。<br><br>
+我们使用一个Raspberry Pi Zeror W的板子来做LoRa通讯网关。当然，我们使用平台提供的LoRa Gateway插件来简化网关的开发。<br><br>
 我们用一块Arduino UNO R3板来连接LED灯。并使用Mud通讯库来让这个IoT终端通过安全授权后加入LoRa网络。<br><br>
 同样，在最后，我们使用App来遥控这个使用LoRa协议的终端节点。<br><br>
 [**Hello, Sensor!**](./Hello_Sensor_Tutorial.md)<br>
@@ -32,6 +32,6 @@ IoT应用中，常见的一个需求是实时视频监控。<br><br>
 [**Hello, Friends**](./Hello_Friends_Tutorial.md)<br>
 在更复杂的IoT应用中，我们需要让IoT设备之间互相进行通讯。<br><br>
 Lithosphere平台为此提供了Firends协议，一个IoT设备可以follow它的Friend设备的事件（Event）。<br><br>
-在IoT LAN内，我们可以配置这个被follow的事件为LAN Follow，这样，事件直接在LAN内被网关进行转发，而不需要通Server端来进行转发。<br><br>
+在IoT LAN内，我们可以配置这个Follow为LAN Follow。LAN Follow监听到的事件，会被网关直接在LAN内进行转发，而不需要通Server端绕一圈来进行转发。<br><br>
 无疑，LAN Follow是一种常见的边缘设备的使用模式。<br><br>
-在这篇教程里，我们学习如何配置Firends协议。
+在这篇教程里，我们学习如何配置和使用Firends协议。
