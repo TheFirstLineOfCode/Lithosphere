@@ -38,19 +38,19 @@ cd granite-lite-mini-1.0.3
 java -jar granite-server-1.0.3-RELEASE.jar -console
 ```
 带-console参数启动Granite Lite XMPP Serverw之后，能够看到Granite Server Console的界面。
-![](https://github.com/TheFirstLineOfCode/Lithosphere/blob/main/granite_server_console.png)
+![](http://120.78.128.21:8080/files/granite_server_console.png)
 我们可以在Console输入services命令来检查Granite XMPP Server的状态。
 ```
 $services
 
 ```
 如果能看到所有的services的状态都是available，说明granite lite server已经被正常的启动了。
-[](https://github.com/TheFirstLineOfCode/Lithosphere/blob/main/granite_server_console_services.png)
+![](http://120.78.128.21:8080/files/granite_server_console_services.png)
 可以用plugins命令，来检查可用的plugins。
 ```
 $plugins
 ```
-![](https://github.com/TheFirstLineOfCode/Lithosphere/blob/main/granite_server_console_plugins.png)
+![](http://120.78.128.21:8080/files/granite_server_console_plugins.png)
 我们会看到，当前的服务器为最小部署版本，部署了最基本的5个插件：
 * granite-lite-auth
 * granite-lite-dba
@@ -62,7 +62,7 @@ $plugins
 ```
 $exit
 ```
-![](https://github.com/TheFirstLineOfCode/Lithosphere/blob/main/granite_server_console_exit.png)
+![](http://120.78.128.21:8080/files/granite_server_console_exit.png)
 
 ## 3 编写第一个插件
 XMPP协议基于典型的C/S架构模式，客户端需要一个服务器上的账号，才能登录到服务器进行通讯。<br><br>
@@ -108,10 +108,110 @@ pom.xml的内容如下：
 
 ```
 
-> **代码说明**<br>
-> * 我们引用com.thefirstlineofcode.granite:com.thefirstlineofcode.granite作为parent POM，这样可以简化我们pom文件的build配置，例如插件配置和依赖库版本配置。<br><br>
-> * 目前，Lithosphere的开源库，仅被部署在TheFirstLineOfCode的私有的maven服务器上。为了构建时能够正确找到开源依赖库，需要配置com.thefirstlineofcode.releases的repository。<br><br>
-> * hello-xmpp-server插件依赖com.thefirstlineofcode.granite.framework:granite-framework-core包，因为我们需要用到granite framework库里的ICommandProcessor扩展点来扩展granite server console功能。
+>**代码说明**<br>
+>* 我们引用com.thefirstlineofcode.granite:com.thefirstlineofcode.granite作为parent POM，这样可以简化我们pom文件的build配置，例如插件配置和依赖库版本配置。
+>>```
+>><parent>
+>>	<groupId>com.thefirstlineofcode.granite</groupId>
+>>	<artifactId>com.thefirstlineofcode.granite</artifactId>
+>>	<version>1.0.3-RELEASE</version>
+>></parent>
+>>```
+><br><br>
+>* 目前，Lithosphere的开源库，仅被部署在TheFirstLineOfCode的私有的maven服务器上。为了构建时能够正确找到开源依赖库，需要配置com.thefirstlineofcode.releases的repository。
+>>```
+>><repositories>
+>>	<repository>
+>>	<id>com.thefirstlineofcode.releases</id>
+>>	<name>TheFirstLineOfCode Repository - Releases</name>
+>>	<url>http://120.25.166.188:9090/repository/maven-releases</url>
+>>	</repository>
+>></repositories>
+>>```
+><br><br>
+>* hello-xmpp-server插件依赖com.thefirstlineofcode.granite.framework:granite-framework-core包，因为我们需要用到granite framework库里的ICommandProcessor扩展点来扩展granite server console功能。
+>>```
+>><dependencies>
+>>	<dependency>
+>>		<groupId>com.thefirstlineofcode.granite.framework</groupId>
+>>		<artifactId>granite-framework-core</artifactId>
+>>	</dependency>
+>></dependencies>
+>>```
+>>注意：这里我们并不需要指定granite-framework-core包的版本号，因为依赖版本号在parent POM中，已经被定义。
 
 ### 3.2 编写插件的代码
 我们创建一个名为HelloXmppCommandsProcessor的类，它继承AbstractCommandsProcessor类。
+```
+package com.thefirstlineofcode.lithosphere.tutorials.helloxmpp;
+
+import org.pf4j.Extension;
+import com.thefirstlineofcode.granite.framework.core.annotations.BeanDependency;
+import com.thefirstlineofcode.granite.framework.core.auth.IAccountManager;
+import com.thefirstlineofcode.granite.framework.core.console.AbstractCommandsProcessor;
+import com.thefirstlineofcode.granite.framework.core.console.IConsoleSystem;
+
+@Extension
+public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
+	private static final String COMMAND_GROUP_SAND_DEMO = "hello-xmpp";
+	private static final String COMMANDS_GROUP_INTRODUCTION = "Commands for hello XMPP tutorial.";
+	private static final String USER_NAME = "geologist";
+	private static final String USER_PASSWORD = "I like lithosphere.";
+	
+	@BeanDependency
+	private IAccountManager accountManager;
+
+	@Override
+	public String getGroup() {
+		return COMMAND_GROUP_SAND_DEMO;
+	}
+
+	@Override
+	public String[] getCommands() {
+		return new String[] {"help", "create-test-user"};
+	}
+
+	@Override
+	public String getIntroduction() {
+		return COMMANDS_GROUP_INTRODUCTION;
+	}
+
+	@Override
+	public void printHelp(IConsoleSystem consoleSystem) {
+		consoleSystem.printTitleLine(String.format("%s Available commands:", getIntroduction()));
+		consoleSystem.printContentLine("hello-xmpp help - Display the help information for hello XMPP tutorial command group.");
+		consoleSystem.printContentLine("hello-xmpp create-test-user - Create a test user for hello XMPP tutorial.");
+	}
+	
+	public void processCreateTestUser(IConsoleSystem consoleSystem) {
+		if (accountManager.exists(USER_NAME)) {
+			consoleSystem.printMessageLine("Test user for hello XMPP tutorial has already existed in system. Ignore to execute the command.");			
+		} else {
+			accountManager.add(USER_NAME, USER_PASSWORD);
+			
+			consoleSystem.printMessageLine("The test user for hello XMPP tutorial has been created.");
+		}
+	}
+}
+```
+
+>**代码说明**<br>
+>* AbstractCommandsProcessor是实现ICommandsProcessor接口的一个抽象基类。当我们实现ICommandsProcessor接口时，一般会继承这个抽象基类，以简化代码的编写。
+><br><br>
+>* 我们看到在HelloXmppCommandsProcessor类的类名定义行上，有一个@Extension标注。
+>>```
+>>@Extension
+>>public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
+>>```
+>>这里的@Extension标注来自pf4j插件框架，表示HelloXmppCommandsProcessor是一个插件扩展。我们在Granite项目中，使用了pf4j插件框架来为XMPP Server提供插件管理功能。<br><br>
+>>关于pf4j插件框架d的更多信息，可以参考[pf4j官方网站](https://pf4j.org/)<br><br>
+>>在这里，我们只要简单的理解，@Extension表示HelloXmppCommandsProcessor是一个ICommandProcessor的扩展，这个扩展会给Granite Server Console贡献功能。
+><br><br>
+>* 我们看到打了@BeanDependency标注的一个IAccountManager实例引用。
+>>```
+>> @BeanDependency
+>> private IAccountManager accountManager;
+>>```
+>> @BeanDependency标注来自Granite Framework，表达对Spring Bean的引用。<br><br>
+>> Granite无缝集成了Spring Framework。我们可以使用Granite Framework提供的@BeanDependency标注来引用Spring的Bean。<br><br>
+>>在这里，@BeanDependency的作用和spring framework里的@Resource标注类似。
