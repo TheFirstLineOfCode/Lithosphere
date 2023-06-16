@@ -38,7 +38,7 @@ cd granite-lite-mini-1.0.3
 java -jar granite-server-1.0.3-RELEASE.jar -console
 ```
 带-console参数启动Granite Lite XMPP Serverw之后，能够看到Granite Server Console的界面。
-![](http://120.78.128.21:8080/files/granite_server_console.png)
+![Test](http://120.78.128.21:8080/files/granite_server_console.png)
 <img src="http://120.78.128.21:8080/files/granite_server_console.png">
 我们可以在Console输入services命令来检查Granite XMPP Server的状态。
 ```
