@@ -39,7 +39,7 @@ java -jar granite-server-1.0.3-RELEASE.jar -console
 ```
 带-console参数启动Granite Lite XMPP Serverw之后，能够看到Granite Server Console的界面。
 ![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console.png)
-<br>
+<br><br>
 我们可以在Console输入services命令来检查Granite XMPP Server的状态。
 ```
 $services
@@ -53,7 +53,7 @@ $services
 $plugins
 ```
 ![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console_plugins.png)
-<br>
+<br><br>
 我们会看到，当前的服务器为最小部署版本，部署了最基本的5个插件：
 * granite-lite-auth
 * granite-lite-dba
@@ -66,7 +66,7 @@ $plugins
 $exit
 ```
 ![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console_exit.png)
-<br>
+<br><br>
 ## 3 编写第一个插件
 XMPP协议基于典型的C/S架构模式，客户端需要一个服务器上的账号，才能登录到服务器进行通讯。<br><br>
 如何在Granite XMPP Server上创建一个用户呢？<br><br>
