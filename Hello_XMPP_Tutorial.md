@@ -38,23 +38,19 @@ cd granite-lite-mini-1.0.3
 java -jar granite-server-1.0.3-RELEASE.jar -console
 ```
 带-console参数启动Granite Lite XMPP Serverw之后，能够看到Granite Server Console的界面。
-![Test](http://120.78.128.21:8080/files/granite_server_console.png)
-测试
-<img src="http://120.78.128.21:8080/files/granite_server_console.png">
-测试
-![Test](https://img-blog.csdnimg.cn/20200630180500452.png?x-oss-proc)
+![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console.png)
 我们可以在Console输入services命令来检查Granite XMPP Server的状态。
 ```
 $services
 
 ```
 如果能看到所有的services的状态都是available，说明granite lite server已经被正常的启动了。
-![](http://120.78.128.21:8080/files/granite_server_console_services.png)
+![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console_services.png)
 可以用plugins命令，来检查可用的plugins。
 ```
 $plugins
 ```
-![](http://120.78.128.21:8080/files/granite_server_console_plugins.png)
+![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console_plugins.png)
 我们会看到，当前的服务器为最小部署版本，部署了最基本的5个插件：
 * granite-lite-auth
 * granite-lite-dba
@@ -66,7 +62,7 @@ $plugins
 ```
 $exit
 ```
-![](http://120.78.128.21:8080/files/granite_server_console_exit.png)
+![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console_exit.png)
 
 ## 3 编写第一个插件
 XMPP协议基于典型的C/S架构模式，客户端需要一个服务器上的账号，才能登录到服务器进行通讯。<br><br>
