@@ -8,6 +8,7 @@ Hello, Lithosphere是专门为新手准备的一系列教程。<br><br>
 Lithosphere IoT平台主要使用XMPP协议和插件架构技术。<br><br>
 在这篇教程里，让我们来熟悉一下Granite XMPP Server，和Chalk客户端XMPP库，以及学习如何编写XMPP协议插件。<br><br>
 这篇教程不会直接涉及到IoT的开发，但是通过这篇教程，可以熟悉XMPP协议和插件架构的概念。这样在后续的教程中，我们学习使用IoT相关插件来开发时，会更加容易理解在背后发生了什么。<br><br>
+如果你不想了解Lithosphere IoT平台的技术细节，而只是想尽快的用手机App控制硬件板上的LED，让灯闪起来。那么，你可以先跳过这篇教程，进入下一篇教程。<br><br>
 [**Hello, Actuator!**](./Hello_Actuator_Tutorial.md)<br>
 让我们走进IoT的世界！<br><br>
 在这篇教程里，我们用一块Raspberry PI Zero W的板子，通过GPIO连接一个LED灯。<br><br>
@@ -15,9 +16,9 @@ Lithosphere IoT平台主要使用XMPP协议和插件架构技术。<br><br>
 在这篇教程里，我们还会涉及到IoT设备安全授权入网的相关内容。<br><br>
 [**Hello, LoRa!**](./Hello_LoRa_Tutorial.md)<br>
 IoT系统里，怎么能不出现IoT通讯协议呢？<br><br>
-在这篇教程里，我们来学习如何组网LoRa通讯设备。<br><br>
-我们使用一个Raspberry Pi Zeror W的板子来做LoRa通讯网关。当然，我们使用平台提供的LoRa Gateway插件来简化网关的开发。<br><br>
-我们用一块Arduino UNO R3板来连接LED灯。并使用Mud通讯库来让这个IoT终端通过安全授权后加入LoRa网络。<br><br>
+在这篇教程里，我们来学习如何组网使用LoRa协议的通讯设备。<br><br>
+我们使用一个Raspberry Pi 3B的树莓派板来做LoRa通讯网关。当然，我们使用平台提供的LoRa Gateway插件来简化网关的开发。<br><br>
+我们用一块Arduino UNO R3硬件板来连接LED灯。并使用Mud通讯库来让这个IoT终端通过安全授权后加入LoRa网络。<br><br>
 同样，在最后，我们使用App来遥控这个使用LoRa协议的终端节点。<br><br>
 [**Hello, Sensor!**](./Hello_Sensor_Tutorial.md)<br>
 Sensor是IoT应用里常见的设备。<br><br>
