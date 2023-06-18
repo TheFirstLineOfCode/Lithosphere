@@ -4,7 +4,7 @@
 我们编写一个简单的应用，来熟悉Chalk和Granite的使用，学习如何通过编写插件来扩展Lithosphere平台功能。<br><br>
 
 ## 1 前置条件：
-**Java >= 11**<br>
+**Java >= 11**<br><br>
 **Granite Lite Mini XMPP Server**<br>
 点击这里下载[Granite Lite Mini XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.3-RELEASE/granite-lite-mini-1.0.3-RELEASE.zip)
 
@@ -107,7 +107,6 @@ pom.xml的内容如下：
 		</repository>
 	</repositories>
 </project>
-
 ```
 
 >**代码说明**<br>
@@ -121,6 +120,7 @@ pom.xml的内容如下：
 >>```
 ><br><br>
 >* 目前，Lithosphere的开源库，仅被部署在TheFirstLineOfCode的私有的maven服务器上。为了构建时能够正确找到开源依赖库，需要配置com.thefirstlineofcode.releases的repository。
+
 >>```
 >><repositories>
 >>	<repository>
@@ -132,6 +132,7 @@ pom.xml的内容如下：
 >>```
 ><br><br>
 >* hello-xmpp-server插件依赖com.thefirstlineofcode.granite.framework:granite-framework-core包，因为我们需要用到granite framework库里的ICommandProcessor扩展点来扩展granite server console功能。
+
 >>```
 >><dependencies>
 >>	<dependency>
@@ -140,7 +141,7 @@ pom.xml的内容如下：
 >>	</dependency>
 >></dependencies>
 >>```
->>注意：这里我们并不需要指定granite-framework-core包的版本号，因为依赖版本号在parent POM中，已经被定义。
+>>注意：这里我们并不需要指定granite-framework-core包的版本号，因为依赖版本号在parent POM中，已经被定义。<br><br>
 
 ### 3.2 编写插件的代码
 我们创建一个名为HelloXmppCommandsProcessor的类，它继承AbstractCommandsProcessor类。
@@ -196,8 +197,7 @@ public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
 	}
 }
 ```
-
->**代码说明**<br>
+>**代码说明**
 >* AbstractCommandsProcessor是实现ICommandsProcessor接口的一个抽象基类。当我们实现ICommandsProcessor接口时，一般会继承这个抽象基类，以简化代码的编写。
 ><br><br>
 >* 我们看到在HelloXmppCommandsProcessor类的类名定义行上，有一个@Extension标注。
@@ -205,7 +205,7 @@ public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
 >>@Extension
 >>public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
 >>```
->>这里的@Extension标注来自pf4j插件框架，表示HelloXmppCommandsProcessor是一个插件扩展。我们在Granite项目中，使用了pf4j插件框架来为XMPP Server提供插件管理功能。<br><br>
+>>这里的@Extension标注来自pf4j插件框架，表示HelloXmppCommandsProcessor是一个插件扩展。我们在Granite项目中，使用了pf4j插件框架来为XMPP Server提供插件管理功能。<br>
 >>关于pf4j插件框架d的更多信息，可以参考[pf4j官方网站](https://pf4j.org/)<br><br>
 >>在这里，我们只要简单的理解，@Extension表示HelloXmppCommandsProcessor是一个ICommandProcessor的扩展，这个扩展会给Granite Server Console贡献功能。
 ><br><br>
@@ -263,6 +263,7 @@ hello-xmpp create-test-user
 有了测试用户，我们现在可以用客户端连接到服务器了。<br><br>
 我们写一个简单的测试程序，来测试客户端到服务器的连通性。
 
+### 4.1 编写pom.xml
 创建hell-xmpp-app目录，添加mave配置pom.xml文件。
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -303,16 +304,19 @@ hello-xmpp create-test-user
 
 >**代码说明**<br>
 >* 指定com.thefirstlineofcode.chalk:com.thefirstlineofcode.chalk.parent作为POM的parent，这样可以简化我们pom文件，例如插件配置和依赖库版本配置。
->>```<parent>
->>		<groupId>com.thefirstlineofcode.chalk</groupId>
->>		<artifactId>com.thefirstlineofcode.chalk.parent</artifactId>
->>		<version>1.0.1-RELEASE</version>
->>	</parent>
+
 >>```
-><br><br>
+>><parent>
+>>	<groupId>com.thefirstlineofcode.chalk</groupId>
+>>	<artifactId>com.thefirstlineofcode.chalk.parent</artifactId>
+>>	<version>1.0.1-RELEASE</version>
+>></parent>
+>>```
+><br>
 >* 同样，我们配置com.thefirstlineofcode.releases仓库，使得项目能够找到chalk库依赖。
 ><br><br>
 >* 为了连接到服务器，我们需要com.thefirstlineofcode.chalk:chalk-corey依赖包。我们不需要指定依赖的版本，因为依赖版本已经在parent的POM定义。
+
 >>```
 >><dependency>
 >>	<groupId>com.thefirstlineofcode.chalk</groupId>
@@ -320,6 +324,8 @@ hello-xmpp create-test-user
 >></dependency>
 >>```
 ><br><br>
+
+### 4.2 编写Java代码
 ```
 package com.thefirstlineofcode.lithosphere.tutorials.helloxmpp.app;
 
@@ -356,6 +362,32 @@ public class Main {
 	}
 }
 ```
+>**代码说明**<br>
+>* 指定Stream配置。我们使用StandardStreamConfig。192.168.1.80为服务器域名。5222是XMPP服务的标准端口。
+>>```
+>>StandardStreamConfig streamConfig = new StandardStreamConfig("192.168.1.80", 5222);
+>>streamConfig.setResource("my_notebook");
+>>```
+>* IChatClien是Chalk库的核心API接口，使用它连接到服务器端。
+><br><br>
+
+### 4.3 运行测试代码
+#### 4.3.1 构建hello-xmpp-app程序。
+```
+cd hello-xmpp-app
+mvn clean package
+```
+#### 4.3.2 启动Granite Lite Mini Server
+```
+cd granite-lite-mini-1.0.3-RELEASE
+java -jar granite-server-1.0.3-RELEASE.jar -console
+```
+#### 4.3.3 运行app测试程序
+```
+java -jar hello-xmpp-app-0.0.1-RELEASE.jar
+```
+正常的话，可以看到以下的运行结果。
+![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/connect_to_granite_server.png)
 
 ## 5 通过插件扩展XMPP
 ### 5.1 定义XMPP扩展协议
