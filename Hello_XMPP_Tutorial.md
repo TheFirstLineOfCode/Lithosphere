@@ -37,7 +37,7 @@ cd granite-lite-mini-1.0.3
 java -jar granite-server-1.0.3-RELEASE.jar -console
 ```
 带-console参数启动Granite Lite XMPP Serverw之后，能够看到Granite Server Console的界面。
-![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console.png)
 <br><br>
 我们可以在Console输入services命令来检查Granite XMPP Server的状态。
 ```
@@ -45,13 +45,13 @@ $services
 
 ```
 如果能看到所有的services的状态都是available，说明granite lite server已经被正常的启动了。
-![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console_services.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console_services.png)
 <br><br>
 可以用plugins命令，来检查可用的plugins。
 ```
 $plugins
 ```
-![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console_plugins.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console_plugins.png)
 <br><br>
 我们会看到，当前的服务器为最小部署版本，部署了最基本的5个插件：
 * granite-lite-auth
@@ -64,7 +64,7 @@ $plugins
 ```
 $exit
 ```
-![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console_exit.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console_exit.png)
 <br><br>
 ## 3 编写第一个插件
 XMPP协议基于典型的C/S架构模式，客户端需要一个服务器上的账号，才能登录到服务器进行通讯。<br><br>
@@ -256,7 +256,7 @@ $plugins
 hello-xmpp create-test-user
 ```
 我们可以看到，测试用户已经被创建。
-![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/granite_server_console_hello_xmpp_create_test_user.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console_hello_xmpp_create_test_user.png)
 <br><br>
 
 ## 4 测试连接服务器
@@ -387,9 +387,9 @@ java -jar granite-server-1.0.3-RELEASE.jar -console
 java -jar hello-xmpp-app-0.0.1-RELEASE.jar
 ```
 正常的话，可以看到以下的运行结果。
-![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/connect_to_granite_server.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/connect_to_granite_server.png)
 
 ## 5 通过插件扩展XMPP
 ### 5.1 定义XMPP扩展协议
 XMMP协议的强大之处在于它的扩展性。按照官方的说法，大概有350个XEPs扩展协议。
-![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/how_many_xeps_exists.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/how_many_xeps_exists.png)

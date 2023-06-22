@@ -52,7 +52,7 @@ XMPP协议是一个异步消息通讯协议，在XMPP核心协议里，定义了
 * stream通道被打开后，DaveBowman发送一条message类型的stanza给右边的账号为Hal的客户端。
 * Hal读到信息之后，回复了一条message。
 * 然后DaveBowman关闭了stream通道，会话结束。<br>
-![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/stream_and_stanza.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/stream_and_stanza.png)
 ### 1.4 Stanza
 当XMPP实体建立连接并打开stream后，它就可以给其它XMPP实体发送stanza类型的消息了。
 stanza是XMPP协议里进行信息交换的顶级元素。有3种类型的stanza：Message，Presence，IQ(Info/Query)。<br><br>
@@ -92,7 +92,7 @@ Lithosphere平台，也主要使用IQ来实现IoT扩展协议。
 
 ## 2 Plugin-Architecture
 插件架构将系统分为两部分：内核系统、插件。<br><br>
-![](https://cdn.jsdelivr.net/gh/XDongger/dongger_s_img_repo/images/plugin_architecture.png)<br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/plugin_architecture.png)<br>
 插件架构的主要架构特征是高度模块化和极强的扩展性。<br><br>
 经过精心设计的插件系统，每个插件相互之间是相互解耦的，再加上插件在运行时才绑定到主程序，这使得它易于扩展，并可以被灵活部署。
 ### 2.1 Extension Point
