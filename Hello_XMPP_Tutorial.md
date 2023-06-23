@@ -66,6 +66,7 @@ $exit
 ```
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console_exit.png)
 <br><br>
+
 ## 3 编写第一个插件
 XMPP协议基于典型的C/S架构模式，客户端需要一个服务器上的账号，才能登录到服务器进行通讯。<br><br>
 如何在Granite XMPP Server上创建一个用户呢？<br><br>
@@ -225,21 +226,34 @@ public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
 >>accountManager.add(USER_NAME, USER_PASSWORD);
 >>```
 ><br><br>
-### 3.3 打包并部署插件
-#### 3.3.1 打包插件
+### 3.3 编写插件配置文件
+在src/main/resources目录下，创建plugin.properties文件，内容如下：
+```
+plugin.id=hello-xmpp-server
+plugin.provider=TheFirstLineOfCode
+plugin.version=0.0.1-RELEASE
+```
+>**代码说明**
+>* 我们使用pf4j作为服务器端插件管理器。pf4j要求使用plugin.properties定义插件的配置属性。
+>* 配置文件最重要的属性是plugin.id，每个插件都必须有自己唯一的插件ID。
+
+<br><br>
+
+### 3.4 打包并部署插件
+#### 3.4.1 打包插件
 使用maven构建插件。
 ```
 cd hello-xmpp-server
 mvn clean package
 ```
 <br><br>
-#### 3.3.2 部署插件到Granite Lite Server
+#### 3.4.2 部署插件到Granite Lite Server
 将插件包copy到服务器plugins目录下。
 ```
 cp target/hello-xmpp-server-0.0.1-RELEASE.jar ${GRANITE_XMPP_SERVER_HOME}/plugins
 ```
 <br><br>
-#### 3.3.3 创建测试用户
+#### 3.4.3 创建测试用户
 启动Granite Lite XMPP Server
 ```
 cd granite-lite-mini-1.0.3
@@ -263,8 +277,8 @@ hello-xmpp create-test-user
 有了测试用户，我们现在可以用客户端连接到服务器了。<br><br>
 我们写一个简单的测试程序，来测试客户端到服务器的连通性。
 
-### 4.1 编写pom.xml
-创建hell-xmpp-app目录，添加mave配置pom.xml文件。
+### 4.1 创建hello-xmpp-app工程
+创建hello-xmpp-app目录，添加mave配置pom.xml文件。
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -302,9 +316,8 @@ hello-xmpp create-test-user
 
 ```
 
->**代码说明**<br>
+>**代码说明**
 >* 指定com.thefirstlineofcode.chalk:com.thefirstlineofcode.chalk.parent作为POM的parent，这样可以简化我们pom文件，例如插件配置和依赖库版本配置。
-
 >>```
 >><parent>
 >>	<groupId>com.thefirstlineofcode.chalk</groupId>
@@ -316,14 +329,13 @@ hello-xmpp create-test-user
 >* 同样，我们配置com.thefirstlineofcode.releases仓库，使得项目能够找到chalk库依赖。
 ><br><br>
 >* 为了连接到服务器，我们需要com.thefirstlineofcode.chalk:chalk-corey依赖包。我们不需要指定依赖的版本，因为依赖版本已经在parent的POM定义。
-
 >>```
 >><dependency>
 >>	<groupId>com.thefirstlineofcode.chalk</groupId>
 >>	<artifactId>chalk-core</artifactId>
 >></dependency>
 >>```
-><br><br>
+<br><br>
 
 ### 4.2 编写Java代码
 ```
@@ -363,13 +375,14 @@ public class Main {
 }
 ```
 >**代码说明**<br>
->* 指定Stream配置。我们使用StandardStreamConfig。192.168.1.80为服务器域名。5222是XMPP服务的标准端口。
+>*指定Stream配置。我们使用StandardStreamConfig。192.168.1.80为服务器域名。5222是XMPP服务的标准端口。
 >>```
 >>StandardStreamConfig streamConfig = new StandardStreamConfig("192.168.1.80", 5222);
 >>streamConfig.setResource("my_notebook");
 >>```
+><br>
 >* IChatClien是Chalk库的核心API接口，使用它连接到服务器端。
-><br><br>
+<br><br>
 
 ### 4.3 运行测试代码
 #### 4.3.1 构建hello-xmpp-app程序。
@@ -392,4 +405,257 @@ java -jar hello-xmpp-app-0.0.1-RELEASE.jar
 ## 5 通过插件扩展XMPP
 ### 5.1 定义XMPP扩展协议
 XMMP协议的强大之处在于它的扩展性。按照官方的说法，大概有350个XEPs扩展协议。
-![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/how_many_xeps_exists.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/how_many_xeps_exists.png)<br><br>
+接下来，让我们来尝试扩展XMPP协议。<br><br>
+让我们来设计一个简单的扩展协议，如下：
+```
+<iq from="geologist@192.168.1.180">
+	<hello xmlns="urn:lithosphere:tutorials:hello-xmpp"
+			name="Geologist">
+		<greeting>
+			Hello, XMPP Server!
+		</greeting>
+	</hello>
+</iq>
+
+<iq to="geologist@192.168.1.180">
+	<hello xmlns="urn:lithosphere:tutorials:hello-xmpp">
+		<greeting>
+			Hello, Geologist! I'm Granite XMPP Server.
+		</greeting>
+	</hello>
+</iq>
+```
+>**注**<br>
+>*客户端向服务器发送一条hello信息。
+><br><br>
+>*服务器端收到后，返回使用name的问候，并声明自己是Granite XMPP Server。
+
+<br>
+
+这个协议非常之简单，但是包含了完整的XMPP协议元素。它包含了客户端和服务器端的完整交互。服务器读取客户端发来请求的参数，对应这个参数的逻辑处理，然后返回处理结果给客户端。<br><br>
+Ok，让我们来用插件技术来实现这个协议。<br><br>
+### 5.2 开发协议包
+为何我们需要单独开发一个包含协议对象的协议包？<br><br>
+这是因为我们会使用叫OXM（Object-XMPP Mapping）的技术。简单来说，我们希望能够屏蔽掉XMPP协议实现的细节。我们不想花太多时间在怎么编写XMPP的XML协议文档上，我们希望只需要简单的对协议对象做编程操作，框架来帮我们讲协议对象翻译成XMPP的对应XML协议文档。<br><br>
+当然，因为Lithosphere支持BXMPP，我们更不想去研究怎么把XMPP的XML协议文档，翻译成二进制的XMPP协议流。框架来帮我们将协议对象翻译成对应的网络上传输的协议数据<br><br>
+使用OXM技术，我们定义协议对象，然后对它进行操作即可，不再需要关心XMPP协议的细节。<br><br>
+使用OXM定义的协议对象，在客户端和服务器端，都会被使用，这些协议对象是可复用的。<br><br>
+所以，我们最好定一个单独的协议包，已便于在后面客户端和服务器端复用这些协议对象。<br><br>
+#### 5.2.1 创建协议工程
+创建hello-xmpp-protocol工程，pom.xml如下：
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.thefirstlineofcode.basalt</groupId>
+		<artifactId>com.thefirstlineofcode.basalt</artifactId>
+		<version>1.1.0-RELEASE</version>
+	</parent>
+
+	<groupId>com.thefirstlineofcode.lithosphere.tutorials.hello-xmpp</groupId>
+	<artifactId>hello-xmpp-protocol</artifactId>
+	<name>Hello XMPP protocol</name>
+	<version>0.0.1-RELEASE</version>
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.thefirstlineofcode.basalt</groupId>
+			<artifactId>basalt-oxm</artifactId>
+		</dependency>
+	</dependencies>
+	
+	<repositories>
+		<repository>
+			<id>com.thefirstlineofcode.releases</id>
+			<name>TheFirstLineOfCode Repository - Releases</name>
+			<url>http://120.25.166.188:9090/repository/maven-releases/</url>
+		</repository>
+	</repositories>
+	
+</project>
+```
+
+> **代码说明**<br><br>
+>*指定parent为com.thefirstlineofcode.basalt:com.thefirstlineofcode.basalt，这样可以直接引用basalt parent pom的依赖管理配置。
+><br><br>
+>*因为要使用OXM(Object-XMPP Mapping)，所以须依赖basalt-oxm库。
+
+<br><br>
+#### 5.2.2 定义协议对象
+定义一个协议对象Hello。
+```
+package com.thefirstlineofcode.lithosphere.tutorials.helloxmpp.protocol;
+
+import com.thefirstlineofcode.basalt.oxm.coc.annotations.ProtocolObject;
+import com.thefirstlineofcode.basalt.oxm.coc.annotations.TextOnly;
+import com.thefirstlineofcode.basalt.oxm.coc.validation.annotations.NotNull;
+
+@ProtocolObject(namespace="urn:lithosphere:tutorials:hello-xmpp", localName = "hello")
+public class Hello {
+	public static final Protocol PROTOCOL = new Protocol("urn:lithosphere:tutorials:hello-xmpp", "hello");
+
+	private String name;
+	
+	@NotNull
+	@TextOnly
+	private String greeting;
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String getGreeting() {
+		return greeting;
+	}
+	
+	public void setGreeting(String greeting) {
+		this.greeting = greeting;
+	}
+}
+```
+> **代码说明**<br>
+>* 使用@ProtocolObject标注，定义XMPP协议的xmlns和local-name。
+>>```
+>>@ProtocolObject(namespace = "urn:lithosphere:tutorials:hello-xmpp", localName = "hello")
+>>```
+>>框架在读取到ProtocolObject时，会把它翻译为对应的XMPP协议扩展。
+>>```
+>><hello xmlns="urn:lithosphere:tutorials:hello-xmpp" ...
+>>...
+>></hello>
+>>```
+><br>
+
+>* greeting字段上有两个标注，@NotNull和@TextOnly。
+>>```
+>>@NotNull
+>>@TextOnly
+>>private String greeting;
+>>```
+>>在翻译协议时，TextOnly会生成下面格式的XML。
+>>```
+>><greeting>
+>>	Hello, XMPP Server!
+>></greeting>
+>>```
+>>而NotNull是OXM框架提供的一个Validator标签，它检查greeting字段不能为NULL。
+><br><br>
+>* OXM框架提供了很多标注，用于定制XMPP协议的XML文档。请阅读<br>
+[Basalt项目文档](https://github.com/TheFirstLineOfCode/basalt)<br>
+了解更多信息。
+><br><br>
+>* 我们定义了一个静态协议字段PROTOCOL，我们后面需要注册扩展时，需要使用这个协议对象来进行相关注册，定义这么一个公有静态协议字段，会方便后续的扩展注册。
+>>关于协议(Protocol)，可以参考概念文档里的<br>
+[协议(Protocol)章节](http://xxxxx)<br><br>
+
+<br><br>
+#### 5.2.3 构建安装协议包
+因为需要在后续客户端和服务器端插件包中，使用协议包，我们在hello-xmpp-protocol工程里，执行构建安装指令，把协议包安装到本地maven仓库。
+```
+cd hello-xmpp-protocol
+mvn clean install
+```
+<br>
+
+协议包已经开发完成，你可以从这里下载[hello-xmpp协议包工程源码](http://xxxx)<br><br>
+
+### 5.3 开发服务器端插件
+#### 5.3.1 服务器端插件工程
+创建hello-xmpp-server工程已经存在，我们在前面使用它来创建测试用户。
+<br><br>
+
+#### 5.3.2 扩展Pipeline Extenders
+创建PipelineExtendersContributor类，代码如下：
+```
+package com.thefirstlineofcode.lithosphere.examples.helloserver;
+
+import org.pf4j.Extension;
+
+import com.thefirstlineofcode.basalt.xmpp.core.IqProtocolChain;
+import com.thefirstlineofcode.granite.framework.core.pipeline.stages.IPipelineExtendersConfigurator;
+import com.thefirstlineofcode.granite.framework.core.pipeline.stages.PipelineExtendersConfigurator;
+import com.thefirstlineofcode.lithosphere.examples.helloprotocol.Hello;
+
+@Extension
+public class PipelineExtendersContributor extends PipelineExtendersConfigurator {
+	private static final IqProtocolChain PROTOCOL_CHAIN_HELLO = new IqProtocolChain(Hello.PROTOCOL);
+
+	@Override
+	protected void configure(IPipelineExtendersConfigurator configurator) {
+		configurator.registerCocParser(PROTOCOL_CHAIN_HELLO, Hello.class);
+		configurator.registerCocTranslator(Hello.class);
+		
+		configurator.registerSingletonXepProcessor(PROTOCOL_CHAIN_HELLO, new HelloProcessor());
+	}
+
+}
+```
+> **代码说明**
+>* PipelineExtendersContributor通过继承抽象类PipelineExtendersConfigurator，实现configure抽象方法来配置pipeline extenders扩展。
+>* Pipeline Extenders是服务器端的主要扩展点接口。Granite服务器除了使用插件架构之外，在设计中，还使用了Pipeline架构设计。Granite Framework提供了一组Pipeline Extenders扩展点，用于扩展Granite插件功能。更多相关信息，可以参考Granite开发文档的<br>
+[Granite Pipeline Extenders章节](http://xxx)
+<br><br>
+>* 类名上的@Extension表示这是一个pf4j的扩展。<br><br>
+>* 我们在configure方法中扩展了3个Pipeline Extenders。<br>
+>> 注册了Hello协议对象的协议解析器
+>>```
+>>configurator.registerCocParser(PROTOCOL_CHAIN_HELLO, Hello.class);
+>>```
+>>在这里，我们使用PROTOCOL_CHAIN_HELLO协议链和Hello协议类，来注册协议对象解析器。<br><br>
+>>关于协议链(Protocol Chain)，可以参考概念文档里的<br>
+[协议链(Protocol Chain)章节](http://xxxxx)<br><br>
+>>关于解析器，可以参考概念文档里的<br>
+[解析器和翻译器章节](http://xxxxx)<br><br>
+>>我们还注册了一个Xep Processor，HelloProcessor用来处理客户端发过来的Hello协议。<br><br>
+>>Xep Processor可以说是服务器端最重要的Pipeline Extender。我们在前面提到，XEPs扩展协议大概有350个，我们当然需要提供响应的机制，允许注册Xep Processor来处理不同的XMPP扩展协议。
+
+<br><br>
+#### 5.3.3 编写HelloProcessor代码
+HelloProcessor类实现IXepProcessor接口，它处理客户端发来的Hello协议。
+```
+package com.thefirstlineofcode.lithosphere.examples.helloserver;
+
+import com.thefirstlineofcode.basalt.xmpp.core.ProtocolException;
+import com.thefirstlineofcode.basalt.xmpp.core.stanza.Iq;
+import com.thefirstlineofcode.basalt.xmpp.core.stanza.error.BadRequest;
+import com.thefirstlineofcode.granite.framework.core.config.IConfiguration;
+import com.thefirstlineofcode.granite.framework.core.config.IConfigurationAware;
+import com.thefirstlineofcode.granite.framework.core.pipeline.stages.processing.IProcessingContext;
+import com.thefirstlineofcode.granite.framework.core.pipeline.stages.processing.IXepProcessor;
+import com.thefirstlineofcode.lithosphere.examples.helloprotocol.Hello;
+
+public class HelloProcessor implements IXepProcessor<Iq, Hello>, IConfigurationAware {
+	private static final String CONFIGURTION_KEY_SERVER_NAME = "server.name";
+	private String serverName;
+
+	@Override
+	public void process(IProcessingContext context, Iq iq, Hello hello) {
+		if (hello.getMyName() == null) {
+			throw new ProtocolException(new BadRequest("Null my name."));
+		}
+		
+		Hello helloFromServer = new Hello();
+		helloFromServer.setGreeting(String.format("Hello! %s. I'm %s.", hello.getMyName(), serverName));
+		Iq result = Iq.createResult(iq, helloFromServer);
+		
+		context.write(result);
+	}
+
+	@Override
+	public void setConfiguration(IConfiguration configuration) {
+		serverName = configuration.getString(CONFIGURTION_KEY_SERVER_NAME, "Granite Server");
+	}
+
+}
+
+```
