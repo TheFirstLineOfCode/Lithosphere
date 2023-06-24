@@ -217,7 +217,7 @@ public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
 >>```
 >> @BeanDependency标注来自Granite Framework，表达对Spring Bean的引用。<br><br>
 >> Granite无缝集成了Spring Framework。我们可以使用Granite Framework提供的@BeanDependency标注来引用Spring的Bean。<br><br>
->>在这里，@BeanDependency的作用和spring framework里的@Resource标注类似。
+>>在这里，@BeanDependency的作用和spring framework里的@Autowired标注类似。
 ><br><br>
 >* 请注意processCreateTestUser方法的命名。这里采用了CoC（约定优于配置）的设计，当Granite Server Console收到扩展命名组的指令时，默认将create-test-user指令的请求，转发到processCreateTestUser方法进行处理。
 ><br><br>
@@ -616,7 +616,11 @@ public class PipelineExtendersContributor extends PipelineExtendersConfigurator 
 [协议(Protocol)和协议链(Protocol Chain)章节](http://xxxxx)<br><br>
 >>关于解析器，可以参考概念文档里的<br>
 [解析器和翻译器章节](http://xxxxx)<br><br>
->>我们还注册了一个Xep Processor，HelloProcessor用来处理客户端发过来的Hello协议。<br><br>
+>>我们还注册了一个单实例的Xep Processor，HelloProcessor用来处理客户端发过来的Hello协议。
+>>```
+>>configurator.registerSingletonXepProcessor(PROTOCOL_CHAIN_HELLO, new HelloProcessor());
+>>```
+<br><br>
 >>Xep Processor可以说是服务器端最重要的Pipeline Extender。我们在前面提到，XEPs扩展协议大概有350个，我们当然需要提供响应的机制，允许注册Xep Processor来处理不同的XMPP扩展协议。
 
 <br><br>
