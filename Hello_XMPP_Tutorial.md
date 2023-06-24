@@ -548,7 +548,7 @@ public class Hello {
 >>	Hello, XMPP Server!
 >></greeting>
 >>```
->>而NotNull是OXM框架提供的一个Validator标签，它检查greeting字段不能为NULL。
+>>而NotNull是OXM框架提供的一个Validator标签，它检查greeting字段不能为null。
 ><br><br>
 >* OXM框架提供了很多标注，用于定制XMPP协议的XML文档。请阅读<br>
 [Basalt项目文档](https://github.com/TheFirstLineOfCode/basalt)<br>
@@ -556,7 +556,7 @@ public class Hello {
 ><br><br>
 >* 我们定义了一个静态协议字段PROTOCOL，我们后面需要注册扩展时，需要使用这个协议对象来进行相关注册，定义这么一个公有静态协议字段，会方便后续的扩展注册。
 >>关于协议(Protocol)，可以参考概念文档里的<br>
-[协议(Protocol)章节](http://xxxxx)<br><br>
+[协议(Protocol)和协议链(Protocol Chain)章节](http://xxxxx)<br><br>
 
 <br><br>
 #### 5.2.3 构建安装协议包
@@ -613,7 +613,7 @@ public class PipelineExtendersContributor extends PipelineExtendersConfigurator 
 >>```
 >>在这里，我们使用PROTOCOL_CHAIN_HELLO协议链和Hello协议类，来注册协议对象解析器。<br><br>
 >>关于协议链(Protocol Chain)，可以参考概念文档里的<br>
-[协议链(Protocol Chain)章节](http://xxxxx)<br><br>
+[协议(Protocol)和协议链(Protocol Chain)章节](http://xxxxx)<br><br>
 >>关于解析器，可以参考概念文档里的<br>
 [解析器和翻译器章节](http://xxxxx)<br><br>
 >>我们还注册了一个Xep Processor，HelloProcessor用来处理客户端发过来的Hello协议。<br><br>
@@ -640,8 +640,8 @@ public class HelloProcessor implements IXepProcessor<Iq, Hello>, IConfigurationA
 
 	@Override
 	public void process(IProcessingContext context, Iq iq, Hello hello) {
-		if (hello.getMyName() == null) {
-			throw new ProtocolException(new BadRequest("Null my name."));
+		if (hello.getName() == null) {
+			throw new ProtocolException(new BadRequest("Null name."));
 		}
 		
 		Hello helloFromServer = new Hello();
@@ -657,5 +657,60 @@ public class HelloProcessor implements IXepProcessor<Iq, Hello>, IConfigurationA
 	}
 
 }
-
 ```
+> **代码说明**<br>
+>* 实现IXepProcessor<Iq, Hello>，在接口方法process里。编写对Hello扩展协议的处理逻辑。
+>* 先检查协议参数有效性，这里，我们检查name参数是否为null。
+>>```
+>>if (hello.getName() == null) {
+>>	throw new ProtocolException(new BadRequest("Null name."));
+>>}
+>>```
+>>这里，我们直接抛出封装BadRequest错误的ProtocolException例外。如果例外抛出，这个例外将会被框架处理，返回客户端一个错误如下：
+>>```
+>><iq type='error' id='ij20ftxf'>
+>>	<error type='modify'>
+>>		<bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+>>		<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>
+>>			Null name
+>>		</text>
+>>	</error>
+>></iq>
+>>```
+>>关于Granite的错误处理，请参考Granite开发文档的<br>
+>>[错误处理章节](http://xxxx)
+
+<br><br>
+#### 5.3.4 编写插件配置文件
+修改plugin.properties文件，在文件最后增加一行内容：
+```
+plugin.id=hello-xmpp-server
+plugin.provider=TheFirstLineOfCode
+plugin.version=0.0.1-RELEASE
+non-plugin.dependencies=hello-protocol
+```
+>**代码说明**
+>* non-plugin是Granite工程在pf4j插件管理框架上扩展的一个插件配置语法。
+>>```
+>> non-plugin.dependencies=hello-xmpp-protocol
+>>```
+>>简单来说，hello-xmpp-protocol包并不是一个插件包，它并没有定义plugin.properties，它只是一个普通标准的jar包。<br><br>
+>>pf4j并不支持插件包引用非插件包，但是因为Lithosphere的协议包，是被客户端（chalk）和服务器端（granite）两端都要引用的依赖包。协议包在客户端（chalk）里被使用时，它并不需要是pf4j插件格式的插件包，只需要是标准格式的jar包就可以了。<br><br>
+>>Lithosphere对此的解决方案，是为pf4j增加一个non-plugin.dependencies的语法，对于不是插件包的依赖，可以使用这个配置语法来进行配置。
+<br><br>
+#### 5.3.5 构建部署协议包
+构建hello-xmpp-server插件包
+```
+cd hello-xmpp-server
+mvn clean package
+```
+<br><br>
+将hello-xmpp-server插件包和它依赖的hello-xmpp-protocol包，把这两个jar包，copy到服务器的plugins目录下。
+```
+cp hello-xmpp-protocol/target/hello-xmpp-protocol-0.0.1-RELEASE.jar granite-lite-mini-1.0.3-RELEASE/plugins
+
+cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.3-RELEASE/plugins
+```
+
+服务器端插件已经开发完成，你可以从这里下载[hello-xmpp-server工程源码](http://xxxx)<br><br>
+
