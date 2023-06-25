@@ -119,7 +119,7 @@ pom.xml的内容如下：
 >>	<version>1.0.3-RELEASE</version>
 >></parent>
 >>```
-><br><br>
+><br>
 >* 目前，Lithosphere的开源库，仅被部署在TheFirstLineOfCode的私有的maven服务器上。为了构建时能够正确找到开源依赖库，需要配置com.thefirstlineofcode.releases的repository。
 
 >>```
@@ -131,7 +131,7 @@ pom.xml的内容如下：
 >>	</repository>
 >></repositories>
 >>```
-><br><br>
+><br>
 >* hello-xmpp-server插件依赖com.thefirstlineofcode.granite.framework:granite-framework-core包，因为我们需要用到granite framework库里的ICommandProcessor扩展点来扩展granite server console功能。
 
 >>```
@@ -142,19 +142,12 @@ pom.xml的内容如下：
 >>	</dependency>
 >></dependencies>
 >>```
->>注意：这里我们并不需要指定granite-framework-core包的版本号，因为依赖版本号在parent POM中，已经被定义。<br><br>
+>>注意：这里我们并不需要指定granite-framework-core包的版本号，因为依赖版本号在parent POM中，已经被定义。
 
+<br><br>
 ### 3.2 编写插件的代码
 我们创建一个名为HelloXmppCommandsProcessor的类，它继承AbstractCommandsProcessor类。
 ```
-package com.thefirstlineofcode.lithosphere.tutorials.helloxmpp.server;
-
-import org.pf4j.Extension;
-import com.thefirstlineofcode.granite.framework.core.annotations.BeanDependency;
-import com.thefirstlineofcode.granite.framework.core.auth.IAccountManager;
-import com.thefirstlineofcode.granite.framework.core.console.AbstractCommandsProcessor;
-import com.thefirstlineofcode.granite.framework.core.console.IConsoleSystem;
-
 @Extension
 public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
 	private static final String COMMAND_GROUP_SAND_DEMO = "hello-xmpp";
@@ -339,15 +332,6 @@ hello-xmpp create-test-user
 
 ### 4.2 编写Java代码
 ```
-package com.thefirstlineofcode.lithosphere.tutorials.helloxmpp.app;
-
-import com.thefirstlineofcode.chalk.core.AuthFailureException;
-import com.thefirstlineofcode.chalk.core.IChatClient;
-import com.thefirstlineofcode.chalk.core.StandardChatClient;
-import com.thefirstlineofcode.chalk.core.stream.StandardStreamConfig;
-import com.thefirstlineofcode.chalk.core.stream.UsernamePasswordToken;
-import com.thefirstlineofcode.chalk.network.ConnectionException;
-
 public class Main {
 	private static final String USER_NAME = "geologist";
 	private static final String USER_PASSWORD = "I like lithosphere.";
@@ -411,7 +395,7 @@ XMMP协议的强大之处在于它的扩展性。按照官方的说法，大概�
 ```
 <iq from="geologist@192.168.1.180">
 	<hello xmlns="urn:lithosphere:tutorials:hello-xmpp"
-			name="Geologist">
+			geologist-name="Dongger">
 		<greeting>
 			Hello, XMPP Server!
 		</greeting>
@@ -421,7 +405,7 @@ XMMP协议的强大之处在于它的扩展性。按照官方的说法，大概�
 <iq to="geologist@192.168.1.180">
 	<hello xmlns="urn:lithosphere:tutorials:hello-xmpp">
 		<greeting>
-			Hello, Geologist! I'm Granite XMPP Server.
+			Hello, Dongger! I'm Granite XMPP Server.
 		</greeting>
 	</hello>
 </iq>
@@ -490,28 +474,22 @@ Ok，让我们来用插件技术来实现这个协议。<br><br>
 #### 5.2.2 定义协议对象
 定义一个协议对象Hello。
 ```
-package com.thefirstlineofcode.lithosphere.tutorials.helloxmpp.protocol;
-
-import com.thefirstlineofcode.basalt.oxm.coc.annotations.ProtocolObject;
-import com.thefirstlineofcode.basalt.oxm.coc.annotations.TextOnly;
-import com.thefirstlineofcode.basalt.oxm.coc.validation.annotations.NotNull;
-
 @ProtocolObject(namespace="urn:lithosphere:tutorials:hello-xmpp", localName = "hello")
 public class Hello {
 	public static final Protocol PROTOCOL = new Protocol("urn:lithosphere:tutorials:hello-xmpp", "hello");
 
-	private String name;
+	private String geologistName;
 	
 	@NotNull
 	@TextOnly
 	private String greeting;
 	
-	public String getName() {
+	public String getGeologistName() {
 		return name;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
+	public void setGeologistName(String geologistName) {
+		this.geologistName = geologistName;
 	}
 	
 	public String getGreeting() {
@@ -556,7 +534,7 @@ public class Hello {
 ><br><br>
 >* 我们定义了一个静态协议字段PROTOCOL，我们后面需要注册扩展时，需要使用这个协议对象来进行相关注册，定义这么一个公有静态协议字段，会方便后续的扩展注册。
 >>关于协议(Protocol)，可以参考概念文档里的<br>
-[协议(Protocol)和协议链(Protocol Chain)章节](http://xxxxx)<br><br>
+[协议(Protocol)和协议链(Protocol Chain)](http://xxxxx)<br><br>
 
 <br><br>
 #### 5.2.3 构建安装协议包
@@ -571,21 +549,12 @@ mvn clean install
 
 ### 5.3 开发服务器端插件
 #### 5.3.1 服务器端插件工程
-创建hello-xmpp-server工程已经存在，我们在前面使用它来创建测试用户。
+hello-xmpp-server工程已经存在，我们在前面使用它来创建测试用户。
 <br><br>
 
 #### 5.3.2 扩展Pipeline Extenders
 创建PipelineExtendersContributor类，代码如下：
 ```
-package com.thefirstlineofcode.lithosphere.examples.helloserver;
-
-import org.pf4j.Extension;
-
-import com.thefirstlineofcode.basalt.xmpp.core.IqProtocolChain;
-import com.thefirstlineofcode.granite.framework.core.pipeline.stages.IPipelineExtendersConfigurator;
-import com.thefirstlineofcode.granite.framework.core.pipeline.stages.PipelineExtendersConfigurator;
-import com.thefirstlineofcode.lithosphere.examples.helloprotocol.Hello;
-
 @Extension
 public class PipelineExtendersContributor extends PipelineExtendersConfigurator {
 	private static final IqProtocolChain PROTOCOL_CHAIN_HELLO = new IqProtocolChain(Hello.PROTOCOL);
@@ -607,15 +576,17 @@ public class PipelineExtendersContributor extends PipelineExtendersConfigurator 
 <br><br>
 >* 类名上的@Extension表示这是一个pf4j的扩展。<br><br>
 >* 我们在configure方法中扩展了3个Pipeline Extenders。<br>
->> 注册了Hello协议对象的协议解析器
+>> 注册了Hello协议对象的协议解析器和协议翻译器。
 >>```
 >>configurator.registerCocParser(PROTOCOL_CHAIN_HELLO, Hello.class);
+>>configurator.registerCocTranslator(Hello.class);
 >>```
 >>在这里，我们使用PROTOCOL_CHAIN_HELLO协议链和Hello协议类，来注册协议对象解析器。<br><br>
+>>我们使用Hello协议对象的类对象，来注册协议翻译器。
 >>关于协议链(Protocol Chain)，可以参考概念文档里的<br>
-[协议(Protocol)和协议链(Protocol Chain)章节](http://xxxxx)<br><br>
->>关于解析器，可以参考概念文档里的<br>
-[解析器和翻译器章节](http://xxxxx)<br><br>
+[协议(Protocol)和协议链(Protocol Chain)](http://xxxxx)<br><br>
+>>关于协议解析器和协议翻译器，可以参考概念文档里的<br>
+[协议解析器和协议翻译器](http://xxxxx)<br><br>
 >>我们还注册了一个单实例的Xep Processor，HelloProcessor用来处理客户端发过来的Hello协议。
 >>```
 >>configurator.registerSingletonXepProcessor(PROTOCOL_CHAIN_HELLO, new HelloProcessor());
@@ -627,29 +598,18 @@ public class PipelineExtendersContributor extends PipelineExtendersConfigurator 
 #### 5.3.3 编写HelloProcessor代码
 HelloProcessor类实现IXepProcessor接口，它处理客户端发来的Hello协议。
 ```
-package com.thefirstlineofcode.lithosphere.examples.helloserver;
-
-import com.thefirstlineofcode.basalt.xmpp.core.ProtocolException;
-import com.thefirstlineofcode.basalt.xmpp.core.stanza.Iq;
-import com.thefirstlineofcode.basalt.xmpp.core.stanza.error.BadRequest;
-import com.thefirstlineofcode.granite.framework.core.config.IConfiguration;
-import com.thefirstlineofcode.granite.framework.core.config.IConfigurationAware;
-import com.thefirstlineofcode.granite.framework.core.pipeline.stages.processing.IProcessingContext;
-import com.thefirstlineofcode.granite.framework.core.pipeline.stages.processing.IXepProcessor;
-import com.thefirstlineofcode.lithosphere.examples.helloprotocol.Hello;
-
 public class HelloProcessor implements IXepProcessor<Iq, Hello>, IConfigurationAware {
-	private static final String CONFIGURTION_KEY_SERVER_NAME = "server.name";
-	private String serverName;
+	private static final String CONFIGURTION_KEY_XMPP_SERVER_NAME = "xmpp.server.name";
+	private String xmppServerName;
 
 	@Override
 	public void process(IProcessingContext context, Iq iq, Hello hello) {
-		if (hello.getName() == null) {
-			throw new ProtocolException(new BadRequest("Null name."));
+		if (hello.getGeologistName() == null) {
+			throw new ProtocolException(new BadRequest("Null geologist name."));
 		}
 		
 		Hello helloFromServer = new Hello();
-		helloFromServer.setGreeting(String.format("Hello! %s. I'm %s.", hello.getMyName(), serverName));
+		helloFromServer.setGreeting(String.format("Hello! %s. I'm %s.", hello.getGeologistName(), xmppServerName));
 		Iq result = Iq.createResult(iq, helloFromServer);
 		
 		context.write(result);
@@ -657,17 +617,17 @@ public class HelloProcessor implements IXepProcessor<Iq, Hello>, IConfigurationA
 
 	@Override
 	public void setConfiguration(IConfiguration configuration) {
-		serverName = configuration.getString(CONFIGURTION_KEY_SERVER_NAME, "Granite Server");
+		xmppServerName = configuration.getString(CONFIGURTION_KEY_XMPP_SERVER_NAME, "Granite XMPP Server");
 	}
 
 }
 ```
 > **代码说明**<br>
 >* 实现IXepProcessor<Iq, Hello>，在接口方法process里。编写对Hello扩展协议的处理逻辑。
->* 先检查协议参数有效性，这里，我们检查name参数是否为null。
+>* 先检查协议参数有效性，这里，我们检查geogistName参数是否为null。
 >>```
->>if (hello.getName() == null) {
->>	throw new ProtocolException(new BadRequest("Null name."));
+>>if (hello.getGeogistName() == null) {
+>>	throw new ProtocolException(new BadRequest("Null geologist name."));
 >>}
 >>```
 >>这里，我们直接抛出封装BadRequest错误的ProtocolException例外。如果例外抛出，这个例外将会被框架处理，返回客户端一个错误如下：
@@ -676,7 +636,7 @@ public class HelloProcessor implements IXepProcessor<Iq, Hello>, IConfigurationA
 >>	<error type='modify'>
 >>		<bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
 >>		<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>
->>			Null name
+>>			Null geologist name
 >>		</text>
 >>	</error>
 >></iq>
@@ -691,7 +651,7 @@ public class HelloProcessor implements IXepProcessor<Iq, Hello>, IConfigurationA
 plugin.id=hello-xmpp-server
 plugin.provider=TheFirstLineOfCode
 plugin.version=0.0.1-RELEASE
-non-plugin.dependencies=hello-protocol
+non-plugin.dependencies=hello-xmpp-protocol
 ```
 >**代码说明**
 >* non-plugin是Granite工程在pf4j插件管理框架上扩展的一个插件配置语法。
@@ -716,5 +676,314 @@ cp hello-xmpp-protocol/target/hello-xmpp-protocol-0.0.1-RELEASE.jar granite-lite
 cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.3-RELEASE/plugins
 ```
 
-服务器端插件已经开发完成，你可以从这里下载[hello-xmpp-server工程源码](http://xxxx)<br><br>
+服务器端插件已经开发完成，你可以从这里下载[hello-xmpp服务器端插件工程源码](http://xxxx)<br><br>
+### 5.4 开发客户端插件
+#### 5.4.1 创建客户端工程
+建立hello-xmpp-client目录，在目录下，创建pom.xml内容如下：
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.thefirstlineofcode.chalk</groupId>
+		<artifactId>com.thefirstlineofcode.chalk.parent</artifactId>
+		<version>1.0.1-RELEASE</version>
+	</parent>
+
+	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloxmpp</groupId>
+	<artifactId>hello-xmpp-client</artifactId>
+	<version>0.0.1-RELEASE</version>
+	<name>Hello XMPP client plugin</name>
+	
+	<dependencies>
+		<dependency>
+			<groupId>com.thefirstlineofcode.chalk</groupId>
+			<artifactId>chalk-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloxmpp</groupId>
+			<artifactId>hello-xmpp-protocol</artifactId>
+			<version>0.0.1-RELEASE</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>com.thefirstlineofcode.releases</id>
+			<name>TheFirstLineOfCode Repository - Releases</name>
+			<url>http://120.25.166.188:9090/repository/maven-releases/</url>
+		</repository>
+	</repositories>	
+	
+</project>
+```
+> **代码说明**<br>
+>* parent POM为com.thefirstlineofcode.chalk:com.thefirstlineofcode.chalk.parent。
+>>```
+>><parent>
+>>	<groupId>com.thefirstlineofcode.chalk</groupId>
+>>	<artifactId>com.thefirstlineofcode.chalk.parent</artifactId>
+>>	<version>1.0.1-RELEASE</version>
+>></parent>
+>>```
+><br>
+
+>* 扩展chalk插件，需要依赖com.thefirstlineofcode.chalk:chalk-core。当然，我们还需要依赖协议包。
+>>```
+>><dependency>
+>>	<groupId>com.thefirstlineofcode.chalk</groupId>
+>>	<artifactId>chalk-core</artifactId>
+>></dependency>
+>><dependency>
+>>	<groupId>com.thefirstlineofcode.lithosphere.
+>>		tutorials.helloxmpp</groupId>
+>>	<artifactId>hello-xmpp-protocol</artifactId>
+>>	<version>0.0.1-RELEASE</version>
+>></dependency>
+>>```
+<br><br>
+#### 5.4.2 定义客户端插件API接口
+编写客户端插件的一个重要任务是，我们需要定义插件API给客户端主程序调用。我们定义一个名为ISayHelloToXmpp的API接口。
+```
+public interface ISayHelloToXmpp {
+	public interface IHelloListener {
+		void greetingReceived(String greeting);
+		void errorReceived(StanzaError error);
+	}
+	
+	void setHelloListener(IHelloListener helloListener);
+	void sayHello(String myName);
+}
+```
+<br><br>
+#### 5.4.3 实现API
+我们编写客户端插件API的实现逻辑。
+```
+public class SayHelloToXmpp implements ISayHelloToXmpp {
+	private IChatServices chatServices;
+	
+	private IHelloListener helloListener;
+	
+	@Override
+	public void sayHello(final String myName) {
+		chatServices.getTaskService().execute(new TaskAdapter<Iq>() {
+
+			@Override
+			public void trigger(IUnidirectionalStream<Iq> stream) {
+				Iq iq = new Iq(Iq.Type.SET, new Hello(myName));
+				stream.send(iq);
+			}
+
+			@Override
+			public void processResponse(IUnidirectionalStream<Iq> stream, Iq response) {
+				if (helloListener != null) {					
+					Hello hello = response.getObject();
+					helloListener.greetingReceived(hello.getGreeting());
+				}
+			}
+			
+			@Override
+			public boolean processError(IUnidirectionalStream<Iq> stream, StanzaError error) {
+				if (helloListener != null) {					
+					helloListener.errorReceived(error);
+				}
+				
+				return true;
+			}
+		});
+	}
+
+	@Override
+	public void setHelloListener(IHelloListener helloListener) {
+		this.helloListener = helloListener;
+	}
+
+}
+```
+> **代码说明**
+>* 插件API实现一般需要使用IChatServices。IChatService封装了XMPP客户端的基础网络通讯服务，客户端插件调用它来简化业务功能的开发。
+>* IChatService由框架注入给插件API实现。我们只需要在API实现类中，提供一个IChatService的类变量就可以了，框架会把IChatService的实现注入。
+>* 我们使用Task Service来执行一个ITask，我们采用继承TaskAdapter抽象类，来简化实现ITask。关于Task Service和ITask接口，可以参考Chalk开发手册了解更多。
+<br><br>
+
+#### 5.4.4 注册插件信息
+我们将编写好的程序逻辑注册到插件中。
+```
+public class HelloXmppPlugin implements IPlugin {
+
+	@Override
+	public void init(IChatSystem chatSystem, Properties properties) {
+		chatSystem.registerTranslator(Hello.class, new CocTranslatorFactory<>(Hello.class));
+		chatSystem.registerParser(new IqProtocolChain(Hello.PROTOCOL),
+				new CocParserFactory<>(Hello.class));
+		chatSystem.registerApi(ISayHelloToXmpp.class, SayHelloToXmpp.class);
+	}
+
+	@Override
+	public void destroy(IChatSystem chatSystem) {
+		chatSystem.unregisterApi(ISayHelloToXmpp.class);
+		chatSystem.unregisterParser(new IqProtocolChain(Hello.PROTOCOL));
+		chatSystem.unregisterTranslator(Hello.class);
+	}
+}
+```
+> **代码说明**
+>* 实现IPlugin接口。<br><br>
+>* 我们在init方法里，注册Hello协议对象的解析器和翻译器。<br>
+>>```
+>>chatSystem.registerTranslator(Hello.class,
+>>		new CocTranslatorFactory<>(Hello.class));
+>>chatSystem.registerParser(
+>>		new IqProtocolChain(Hello.PROTOCOL),
+>>		new CocParserFactory<>(Hello.class));
+>>```
+>>关于协议解析器和协议翻译器，可以参考概念文档里的<br>
+[协议解析器和协议翻译器](http://xxxxx)
+<br><br>
+>* 我们为插件注册插件API和API实现。
+>>```
+>>chatSystem.registerApi(ISayHelloToXmpp.class, SayHelloToXmpp.class);
+>>```
+><br>
+
+>* destory方法，基本上就是init方法的一个反向调用，当销毁插件时，我们将注册的插件相关信息注销掉。
+<br><br>
+#### 5.4.4 构建安装客户端插件包
+客户端应用程序会使用客户端插件包，我们在hello-xmpp-client工程里，执行构建安装指令，把客户端插件包安装到本地maven仓库。
+```
+cd hello-xmpp-client
+mvn clean install
+```
+<br>
+
+客户端插件包已经开发完成，你可以从这里下载[hello-xmpp客户端插件包工程源码](http://xxxx)<br><br>
+
+### 5.5 测试扩展协议
+#### 5.5.1 客户端app工程
+hello-xmpp-app工程已经存在，在前面，我们用它来测试客户端-服务器端连接性。<br><br>
+我们需要增加一些代码逻辑来测试Hello扩展协议。<br><br>
+#### 5.5.2 编写app测试代码
+修改hello-xmpp-app的Main类代码如下：
+```
+public class Main implements IHelloListener {
+	private static final String USER_NAME = "geologist";
+	private static final String USER_PASSWORD = "I like lithosphere.";
+	
+	public static void main(String[] args) {
+		new Main().run();
+	}
+	
+	private void run() {
+		IChatClient chatClient = createChatClient();
+		sayHelloToXmpp(chatClient);
+		
+		if (chatClient != null && chatClient.isConnected())
+			chatClient.close();
+	}
+
+	private void sayHelloToXmpp(IChatClient chatClient) {
+		try {
+			chatClient.connect(new UsernamePasswordToken(USER_NAME, USER_PASSWORD));
+		} catch (ConnectionException e) {
+			throw new RuntimeException("Can't connect to server.", e);
+		} catch (AuthFailureException e) {
+			throw new RuntimeException("????", e);
+		}
+			
+		ISayHelloToXmpp sayHelloToXmpp = chatClient.createApi(ISayHelloToXmpp.class);
+		sayHelloToXmpp.setHelloListener(this);
+		sayHelloToXmppAsAnonymous(sayHelloToXmpp);
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		sayHelloToXmppAsDongger(sayHelloToXmpp);
+		
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private static void sayHelloToXmppAsDongger(ISayHelloToXmpp sayHelloToXmpp) {
+		System.out.println();
+		System.out.println();
+		System.out.println("Say hello to XMPP as Dongger.");
+		sayHelloToXmpp.sayHello("Dongger");
+		System.out.println();
+	}
+
+	private static void sayHelloToXmppAsAnonymous(ISayHelloToXmpp sayHelloToXmpp) {
+		System.out.println();
+		System.out.println();
+		System.out.println("Say hello to XMPP as anonymous.");
+		System.out.println();
+		sayHelloToXmpp.sayHello(null);
+	}
+
+	private static IChatClient createChatClient() {
+		StandardStreamConfig streamConfig = new StandardStreamConfig("192.168.1.80", 5222);
+		streamConfig.setTlsPreferred(false);
+		streamConfig.setResource("my_desktop");
+		IChatClient chatClient = new StandardChatClient(streamConfig);
+		
+		chatClient.register(HelloXmppPlugin.class);
+		
+		return chatClient;
+	}
+
+	@Override
+	public void greetingReceived(String greeting) {
+		System.out.println(greeting);
+	}
+
+	@Override
+	public void errorReceived(StanzaError error) {
+		System.out.println(String.format("Received an stanza error: %s." , error));
+	}
+}
+```
+>**代码说明**<br>
+>* 创建IChatClient时，注册HelloXmppPlugin插件。
+>>```
+>>chatClient.register(HelloXmppPlugin.class);
+>>```
+><br>
+
+>* sayHelloToXmppAsAnonymous方法发送的Hello协议里的geologistName为null，它会引发服务器端抛出错误例外。这会触发HelloListener收到errorReceived()方法调用。
+><br><br>
+>* sayHelloToXmppAsDongger方法发送正确的Hello协议，服务器端会返回XMPP Server的greeting。HelloListener会收到greetingReceived()方法调用。
+
+<br><br>
+#### 5.5.3 运行app测试扩展协议
+构建hello-xmpp-app。
+```
+cd hello-xmpp-app
+mvn clean package
+```
+<br><br>
+运行app程序测试扩展协议。
+```
+cd target
+tar -xzvf hello-xmpp-app-0.0.1-RELEASE.tar.gz
+cd hello-xmpp-app-0.0.1-RELEASE
+```
+<br><br>
+如果一切正常，应该可以看到以下的结果。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/run_hello_xmpp_app.png)
+<br><br>
+>**注**
+>* 运行hello_xmpp_app之前，需要先启动Granite XMPP Server。
+<br><br>
+
+## 6 结论
