@@ -11,7 +11,7 @@ Lithosphere IoT平台主要使用XMPP协议和插件架构技术。<br><br>
 如果你不想了解Lithosphere IoT平台的技术细节，而只是想尽快的用手机App控制硬件板上的LED，让灯闪起来。那么，你可以先跳过这篇教程，进入下一篇教程。<br><br>
 对于大部分常规的IoT应用开发来说，并不需要开发新的XMPP扩展协议，也不需要去开发客户端和服务器端插件，直接使用Lithosphere IoT平台提供的IoT组件，使用Lithosphere IoT开发好的、内置的IoT通讯和数据协议就够用了。<br><br>
 当然，如果你想完全的掌控Lithosphere平台，能够应对任意复杂的IoT应用，那么建议阅读这篇教程。<br><br>
-你也可以再学习完其它几篇教程后，再回来学习这篇讲Lithosphere IoT平台基础概念的教程。
+你也可以再学习完其它几篇教程后，再回来学习这篇讲Lithosphere IoT平台基础技术的教程。
 <br><br>
 [**Hello, Actuator!**](./Hello_Actuator_Tutorial.md)<br>
 让我们走进IoT的世界！<br><br>

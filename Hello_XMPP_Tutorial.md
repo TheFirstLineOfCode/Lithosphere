@@ -125,35 +125,35 @@ pom.xml的内容如下：
 
 >**代码说明**
 >* 我们引用com.thefirstlineofcode.granite:com.thefirstlineofcode.granite作为parent POM，这样可以简化我们pom文件，例如插件配置和依赖库版本配置。
->>```
->><parent>
->>	<groupId>com.thefirstlineofcode.granite</groupId>
->>	<artifactId>com.thefirstlineofcode.granite</artifactId>
->>	<version>1.0.3-RELEASE</version>
->></parent>
->>```
+>>>```
+>>><parent>
+>>>	<groupId>com.thefirstlineofcode.granite</groupId>
+>>>	<artifactId>com.thefirstlineofcode.granite</artifactId>
+>>>	<version>1.0.3-RELEASE</version>
+>>></parent>
+>>>```
 ><br><br>
 >* 目前，Lithosphere的开源库，仅被部署在TheFirstLineOfCode的私有的maven服务器上。为了构建时能够正确找到开源依赖库，需要配置com.thefirstlineofcode.releases的repository。
->>```
->><repositories>
->>	<repository>
->>	<id>com.thefirstlineofcode.releases</id>
->>	<name>TheFirstLineOfCode Repository - Releases</name>
->>	<url>http://120.25.166.188:9090/repository/maven-releases</url>
->>	</repository>
->></repositories>
->>```
+>>>```
+>>><repositories>
+>>>	<repository>
+>>>	<id>com.thefirstlineofcode.releases</id>
+>>>	<name>TheFirstLineOfCode Repository - Releases</name>
+>>>	<url>http://120.25.166.188:9090/repository/maven-releases</url>
+>>>	</repository>
+>>></repositories>
+>>>```
 ><br><br>
 >* hello-xmpp-server插件依赖com.thefirstlineofcode.granite.framework:granite-framework-core包，因为我们需要用到granite framework库里的ICommandProcessor扩展点来扩展granite server console功能。
->>```
->><dependencies>
->>	<dependency>
->>		<groupId>com.thefirstlineofcode.granite.framework</groupId>
->>		<artifactId>granite-framework-core</artifactId>
->>	</dependency>
->></dependencies>
->>```
->>注意：这里我们并不需要指定granite-framework-core包的版本号，因为依赖版本号在parent POM中，已经被定义。
+>>>```
+>>><dependencies>
+>>>	<dependency>
+>>>		<groupId>com.thefirstlineofcode.granite.framework</groupId>
+>>>		<artifactId>granite-framework-core</artifactId>
+>>>	</dependency>
+>>></dependencies>
+>>>```
+>>>注意：这里我们并不需要指定granite-framework-core包的版本号，因为依赖版本号在parent POM中，已经被定义。
 
 <br><br>
 ### 3.2 编写插件的代码
@@ -206,29 +206,29 @@ public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
 >* AbstractCommandsProcessor是实现ICommandsProcessor接口的一个抽象基类。当我们实现ICommandsProcessor接口时，一般会继承这个抽象基类，以简化代码的编写。
 ><br><br>
 >* 我们看到在HelloXmppCommandsProcessor类的类名定义行上，有一个@Extension标注。
->>```
->>@Extension
->>public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
->>```
->>这里的@Extension标注来自pf4j插件框架，表示HelloXmppCommandsProcessor是一个插件扩展。我们在Granite项目中，使用了pf4j插件框架来为XMPP Server提供插件管理功能。<br>
->>关于pf4j插件框架d的更多信息，可以参考[pf4j官方网站](https://pf4j.org/)<br><br>
+>>>```
+>>>@Extension
+>>>public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
+>>>```
+>>这里的@Extension标注来自PF4J插件框架，表示HelloXmppCommandsProcessor是一个插件扩展。我们在Granite项目中，使用了PF4J插件框架来为XMPP Server提供插件管理功能。<br>
+>>关于PF4J插件框架d的更多信息，可以参考[PF4J官方网站](https://pf4j.org/)<br><br>
 >>在这里，我们只要简单的理解，@Extension表示HelloXmppCommandsProcessor是一个ICommandProcessor的扩展，这个扩展会给Granite Server Console贡献功能。
 ><br><br>
 >* 我们看到打了@BeanDependency标注的一个IAccountManager实例引用。
->>```
->> @BeanDependency
->> private IAccountManager accountManager;
->>```
->> @BeanDependency标注来自Granite Framework，表达对Spring Bean的引用。<br><br>
->> Granite无缝集成了Spring Framework。我们可以使用Granite Framework提供的@BeanDependency标注来引用Spring的Bean。<br><br>
->>在这里，@BeanDependency的作用和spring framework里的@Autowired标注类似。
+>>>```
+>>>@BeanDependency
+>>>private IAccountManager accountManager;
+>>>```
+>>>@BeanDependency标注来自Granite Framework，表达对Spring Bean的引用。<br><br>
+>>>Granite无缝集成了Spring Framework。我们可以使用Granite Framework提供的@BeanDependency标注来引用Spring的Bean。<br><br>
+>>>在这里，@BeanDependency的作用和spring framework里的@Autowired标注类似。
 ><br><br>
 >* 请注意processCreateTestUser方法的命名。这里采用了CoC（约定优于配置）的设计，当Granite Server Console收到扩展命名组的指令时，默认将create-test-user指令的请求，转发到processCreateTestUser方法进行处理。
 ><br><br>
 >* 我们在HelloXmppCommandsProcessor类中引用的IAccountManager接口来自Granite Framework包，而它的实例实现来自granite-lite-auth插件。IAccountManager提供了添加账户的服务，我们直接使用该接口服务来添加一个账号。
->>```
->>accountManager.add(USER_NAME, USER_PASSWORD);
->>```
+>>>```
+>>>accountManager.add(USER_NAME, USER_PASSWORD);
+>>>```
 
 <br><br>
 ### 3.3 编写插件配置文件
@@ -239,7 +239,7 @@ plugin.provider=TheFirstLineOfCode
 plugin.version=0.0.1-RELEASE
 ```
 >**代码说明**
->* 我们使用pf4j作为服务器端插件管理器。pf4j要求使用plugin.properties定义插件的配置属性。<br><br>
+>* 我们使用PF4J作为服务器端插件管理器。PF4J要求使用plugin.properties定义插件的配置属性。<br><br>
 >* 配置文件最重要的属性是plugin.id，每个插件都必须有自己唯一的插件ID。
 
 <br><br>
@@ -326,23 +326,23 @@ hello-xmpp create-test-user
 ```
 >**代码说明**
 >* 指定com.thefirstlineofcode.chalk:com.thefirstlineofcode.chalk.parent作为POM的parent，这样可以简化我们pom文件，例如插件配置和依赖库版本配置。
->>```
->><parent>
->>	<groupId>com.thefirstlineofcode.chalk</groupId>
->>	<artifactId>com.thefirstlineofcode.chalk.parent</artifactId>
->>	<version>1.0.1-RELEASE</version>
->></parent>
->>```
+>>>```
+>>><parent>
+>>>	<groupId>com.thefirstlineofcode.chalk</groupId>
+>>>	<artifactId>com.thefirstlineofcode.chalk.parent</artifactId>
+>>>	<version>1.0.1-RELEASE</version>
+>>></parent>
+>>>```
 ><br><br>
 >* 同样，我们配置com.thefirstlineofcode.releases仓库，使得项目能够找到chalk库依赖。
 ><br><br>
 >* 为了连接到服务器，我们需要com.thefirstlineofcode.chalk:chalk-corey依赖包。我们不需要指定依赖的版本，因为依赖版本已经在parent的POM定义。
->>```
->><dependency>
->>	<groupId>com.thefirstlineofcode.chalk</groupId>
->>	<artifactId>chalk-core</artifactId>
->></dependency>
->>```
+>>>```
+>>><dependency>
+>>>	<groupId>com.thefirstlineofcode.chalk</groupId>
+>>>	<artifactId>chalk-core</artifactId>
+>>></dependency>
+>>>```
 
 <br><br>
 ### 4.2 编写Java代码
@@ -375,10 +375,10 @@ public class Main {
 ```
 >**代码说明**
 >* 指定Stream配置。我们使用StandardStreamConfig。192.168.1.80为服务器域名。5222是XMPP服务的标准端口。
->>```
->>StandardStreamConfig streamConfig = new StandardStreamConfig("192.168.1.80", 5222);
->>streamConfig.setResource("my_notebook");
->>```
+>>>```
+>>>StandardStreamConfig streamConfig = new StandardStreamConfig("192.168.1.80", 5222);
+>>>streamConfig.setResource("my_notebook");
+>>>```
 ><br><br>
 >* IChatClien是Chalk库的核心API接口，使用它连接到服务器端。
 
@@ -442,10 +442,10 @@ Ok，让我们来用插件技术来实现这个协议。
 <br><br>
 ### 5.2 开发协议包
 为何我们需要单独开发一个包含协议对象的协议包？<br><br>
-这是因为我们会使用叫OXM（Object-XMPP Mapping）的技术。简单来说，我们希望能够屏蔽掉XMPP协议实现的细节。我们不想花太多时间在怎么编写XMPP的XML协议文档上，我们希望只需要简单的对协议对象做编程操作，框架来帮我们讲协议对象翻译成XMPP的对应XML协议文档。<br><br>
-当然，因为Lithosphere支持BXMPP，我们更不想去研究怎么把XMPP的XML协议文档，翻译成二进制的XMPP协议流。框架来帮我们将协议对象翻译成对应的网络上传输的协议数据。<br><br>
-使用OXM技术，我们定义协议对象，然后对它进行操作即可，不再需要关心XMPP协议的细节。<br><br>
-使用OXM定义的协议对象，在客户端和服务器端，都会被使用。协议对象是可复用的。<br><br>
+这是因为我们会使用叫OXM（Object-XMPP Mapping）的技术。简单来说，我们希望在开发中，能够屏蔽掉XMPP协议实现的细节，简化开发过程。<br><br>
+关于OXM，可以参考概念文档中的[OXM章节](./Concepts.md#OXM)
+<br><br>
+使用OXM，我们会定义的协议对象，这些协议对象，在客户端和服务器端，都会被使用。协议对象是可复用的。<br><br>
 所以，我们最好定一个单独的协议包，已便于在后面客户端和服务器端复用这些协议对象。
 
 <br><br>
@@ -465,7 +465,7 @@ Ok，让我们来用插件技术来实现这个协议。
 		<version>1.1.0-RELEASE</version>
 	</parent>
 
-	<groupId>com.thefirstlineofcode.lithosphere.tutorials.hello-xmpp</groupId>
+	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloxmpp</groupId>
 	<artifactId>hello-xmpp-protocol</artifactId>
 	<name>Hello XMPP protocol</name>
 	<version>0.0.1-RELEASE</version>
@@ -526,29 +526,29 @@ public class Hello {
 ```
 > **代码说明**
 >* 使用@ProtocolObject标注，定义XMPP扩展协议的namespace和local-name。
->>```
->>@ProtocolObject(namespace = "urn:lithosphere:tutorials:hello-xmpp", localName = "hello")
->>```
+>>>```
+>>>@ProtocolObject(namespace = "urn:lithosphere:tutorials:hello-xmpp", localName = "hello")
+>>>```
 >>框架在读取到ProtocolObject标注时，会把它翻译为对应的XMPP协议扩展语法。
->>```
->><hello xmlns="urn:lithosphere:tutorials:hello-xmpp" ...>
->>...
->></hello>
->>```
+>>>```
+>>><hello xmlns="urn:lithosphere:tutorials:hello-xmpp" ...>
+>>>...
+>>></hello>
+>>>```
 ><br><br>
 >* greeting字段上有两个标注，@NotNull和@TextOnly。
->>```
->>@NotNull
->>@TextOnly
->>private String greeting;
->>```
->>在翻译协议时，TextOnly会生成下面格式的XML。
->>```
->><greeting>
->>	Hello, XMPP Server!
->></greeting>
->>```
->>而NotNull是OXM框架提供的一个Validator标签，它检查greeting字段不能为null。
+>>>```
+>>>@NotNull
+>>>@TextOnly
+>>>private String greeting;
+>>>```
+>>>在翻译协议时，TextOnly会生成下面格式的XML。
+>>>```
+>>><greeting>
+>>>	Hello, XMPP Server!
+>>></greeting>
+>>>```
+>>>而NotNull是OXM框架提供的一个Validator标签，它检查greeting字段不能为null。
 ><br><br>
 >* OXM框架提供了很多标注，用于定制XMPP协议的XML文档。请阅读<br>
 [Basalt项目文档](https://github.com/TheFirstLineOfCode/basalt)<br>
@@ -556,7 +556,7 @@ public class Hello {
 ><br><br>
 >* 我们定义了一个静态协议字段PROTOCOL。因为我们后面需要注册插件扩展时，会经常需要使用到协议信息。定义这么一个公有静态协议字段，会方便后续的扩展注册。
 >>关于协议(Protocol)，可以参考概念文档里的<br>
-[协议(Protocol)和协议链(Protocol Chain)](http://xxxxx)
+[Protocol and Protocol Chain](./Concepts.md#Protocol)
 
 <br><br>
 #### 5.2.3 构建安装协议包
@@ -567,7 +567,7 @@ mvn clean install
 ```
 
 <br><br>
-协议包已经开发完成，你可以从这里下载[hello-xmpp协议包工程源码](http://xxxx)
+协议包已经开发完成，你可以参考官方开源仓库代码[hello-xmpp-protocol协议包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-xmpp/hello-xmpp-protocol)
 
 <br><br>
 ### 5.3 开发服务器端插件
@@ -595,27 +595,27 @@ public class PipelineExtendersContributor extends PipelineExtendersConfigurator 
 > **代码说明**
 >* PipelineExtendersContributor通过继承抽象类PipelineExtendersConfigurator，实现configure抽象方法来配置pipeline extenders扩展。<br><br>
 >* Pipeline Extenders是服务器端的主要扩展点接口。Granite服务器除了使用插件架构之外，在设计中，还使用了Pipeline架构设计。Granite Framework提供了一组Pipeline Extenders扩展点，用于扩展Granite插件功能。更多相关信息，可以参考Granite开发文档的<br>
-[Granite Pipeline Extenders章节](http://xxx)
+[Granite Pipeline Extenders章节](http://TheFirstLineOfCode/Lithosphere/granite/dev_guide.md#Extenders)
 ><br><br>
->* 类名上的@Extension表示这是一个pf4j的扩展。<br><br>
+>* 类名上的@Extension表示这是一个PF4J的扩展。<br><br>
 >* 我们在configure方法中扩展了3个Pipeline Extenders。<br>
->> 注册了Hello协议对象的协议解析器和协议翻译器。
->>```
->>configurator.registerCocParser(PROTOCOL_CHAIN_HELLO, Hello.class);
->>configurator.registerCocTranslator(Hello.class);
->>```
->>在这里，我们使用PROTOCOL_CHAIN_HELLO协议链和Hello协议类，来注册协议对象解析器。<br><br>
->>我们使用Hello协议对象的类对象，来注册协议翻译器。<br><br>
->>关于协议链(Protocol Chain)，可以参考概念文档里的<br>
-[协议(Protocol)和协议链(Protocol Chain)](http://xxxxx)
->><br><br>
->>关于协议解析器和协议翻译器，可以参考概念文档里的<br>
-[协议解析器和协议翻译器](http://xxxxx)
->><br><br>
->>我们还注册了一个单实例的Xep Processor，HelloProcessor用来处理客户端发过来的Hello协议。
->>```
->>configurator.registerSingletonXepProcessor(PROTOCOL_CHAIN_HELLO, new HelloProcessor());
->>```
+>>> 注册了Hello协议对象的协议解析器和协议翻译器。
+>>>```
+>>>configurator.registerCocParser(PROTOCOL_CHAIN_HELLO, Hello.class);
+>>>configurator.registerCocTranslator(Hello.class);
+>>>```
+>>>在这里，我们使用PROTOCOL_CHAIN_HELLO协议链和Hello协议类，来注册协议对象解析器。<br><br>
+>>>我们使用Hello协议对象的类对象，来注册协议翻译器。<br><br>
+>>>关于协议链(Protocol Chain)，可以参考概念文档里的<br>
+[Protocol and Protocol Chain](./Concepts.md#Protocol)
+>>><br><br>
+>>>关于协议解析器和协议翻译器，可以参考概念文档里的<br>
+[协议解析器和协议翻译器](./Concepts.md#Parser)
+>>><br><br>
+>>>我们还注册了一个单实例的Xep Processor，HelloProcessor用来处理客户端发过来的Hello协议。
+>>>```
+>>>configurator.registerSingletonXepProcessor(PROTOCOL_CHAIN_HELLO, new HelloProcessor());
+>>>```
 >><br><br>
 >>Xep Processor可以说是服务器端最重要的Pipeline Extender。我们在前面提到，XEPs扩展协议大概有350个，我们当然需要提供响应的机制，允许注册Xep Processor来处理不同的XMPP扩展协议。
 
@@ -650,24 +650,24 @@ public class HelloProcessor implements IXepProcessor<Iq, Hello>, IConfigurationA
 > **代码说明**
 >* 实现IXepProcessor<Iq, Hello>，在接口方法process里。编写对Hello扩展协议的处理逻辑。<br><br>
 >* 先检查协议参数有效性，这里，我们检查geogistName参数是否为null。
->>```
->>if (hello.getGeogistName() == null) {
->>	throw new ProtocolException(new BadRequest("Null geologist name."));
->>}
->>```
->>这里，我们直接抛出封装BadRequest错误的ProtocolException例外。如果例外抛出，这个例外将会被框架处理，返回客户端一个错误如下：
->>```
->><iq type='error' id='ij20ftxf'>
->>	<error type='modify'>
->>		<bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
->>		<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>
->>			Null geologist name
->>		</text>
->>	</error>
->></iq>
->>```
->>关于Granite的错误处理，请参考Granite开发文档的<br>
->>[错误处理章节](http://xxxx)
+>>>```
+>>>if (hello.getGeogistName() == null) {
+>>>	throw new ProtocolException(new BadRequest("Null geologist name."));
+>>>}
+>>>```
+>>>这里，我们直接抛出封装BadRequest错误的ProtocolException例外。如果例外抛出，这个例外将会被框架处理，返回客户端一个错误如下：
+>>>```
+>>><iq type='error' id='ij20ftxf'>
+>>>	<error type='modify'>
+>>>		<bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+>>>		<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>
+>>>			Null geologist name
+>>>		</text>
+>>>	</error>
+>>></iq>
+>>>```
+>>>关于Granite的错误处理，请参考Granite开发文档的<br>
+>>>[错误处理章节](http://github.com/TheFirstLineOfCode/granite/dev_guide.md#Error)
 
 <br><br>
 #### 5.3.4 编写插件配置文件
@@ -679,13 +679,13 @@ plugin.version=0.0.1-RELEASE
 non-plugin.dependencies=hello-xmpp-protocol
 ```
 >**代码说明**
->* non-plugin是Granite工程在pf4j插件管理框架上扩展的一个插件配置语法。
->>```
->> non-plugin.dependencies=hello-xmpp-protocol
->>```
->>简单来说，hello-xmpp-protocol包并不是一个插件包，它并没有定义plugin.properties，它只是一个普通标准的jar包。<br><br>
->>pf4j并不支持插件包引用非插件包，但是因为Lithosphere的协议包，是被客户端（chalk）和服务器端（granite）两端都要引用的依赖包。协议包在客户端（chalk）里被使用时，它并不需要是pf4j插件格式的插件包，只需要是标准格式的jar包就可以了。<br><br>
->>Lithosphere对此的解决方案，是为pf4j增加一个non-plugin.dependencies的语法，对于不是插件包的依赖，可以使用这个配置语法来进行配置。
+>* non-plugin是Granite工程在PF4J插件管理框架上扩展的一个插件配置语法。
+>>>```
+>>> non-plugin.dependencies=hello-xmpp-protocol
+>>>```
+>>>简单来说，hello-xmpp-protocol包并不是一个插件包，它并没有定义plugin.properties，它只是一个普通标准的jar包。<br><br>
+>>>PF4J并不支持插件包引用非插件包，但是因为Lithosphere的协议包，是被客户端（chalk）和服务器端（granite）两端都要引用的依赖包。协议包在客户端（chalk）里被使用时，它并不需要是PF4J插件格式的插件包，只需要是标准格式的jar包就可以了。<br><br>
+>>>Lithosphere对此的解决方案，是为PF4J增加一个non-plugin.dependencies的语法，对于不是插件包的依赖，可以使用这个配置语法来进行配置。
 
 <br><br>
 #### 5.3.5 构建部署协议包
@@ -703,7 +703,7 @@ cp hello-xmpp-protocol/target/hello-xmpp-protocol-0.0.1-RELEASE.jar granite-lite
 cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.3-RELEASE/plugins
 ```
 
-服务器端插件已经开发完成，你可以从这里下载[hello-xmpp服务器端插件工程源码](http://xxxx)
+服务器端插件已经开发完成，你可以参考官方开源仓库代码[hello-xmpp-server服务器端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-xmpp/hello-xmpp-server)
 
 <br><br>
 ### 5.4 开发客户端插件
@@ -838,7 +838,7 @@ public class SayHelloToXmpp implements ISayHelloToXmpp {
 >* 插件API实现一般需要使用IChatServices。IChatService封装了XMPP客户端的基础网络通讯服务，客户端插件调用它来简化业务功能的开发。<br><br>
 >* IChatService由框架注入给插件API实现。我们只需要在API实现类中，提供一个IChatService的类变量就可以了，框架会自动把IChatService的实现注入。<br><br>
 >* 我们使用Task Service来执行一个ITask，我们采用继承TaskAdapter抽象类，来简化实现ITask。
->* 关于Chalk的使用，可以参考[Chalk开发手册](http://xxxx)了解更多。
+>* 关于Chalk的使用，可以参考[Chalk项目文档](http://github.com/TheFirstLineOfCode/chalk)了解更多。
 
 <br><br>
 #### 5.4.4 注册插件信息
@@ -890,7 +890,7 @@ cd hello-xmpp-client
 mvn clean install
 ```
 <br><br>
-客户端插件包已经开发完成，你可以从这里下载[hello-xmpp客户端插件包工程源码](http://xxxx)
+客户端插件包已经开发完成，你可以参考官方开源仓库代码[hello-xmpp-client客户端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-xmpp/hello-xmpp-client)
 
 <br><br>
 ### 5.5 测试扩展协议
@@ -996,6 +996,8 @@ public class Main implements IHelloListener {
 ><br><br>
 >* sayHelloToXmppAsDongger方法发送正确的Hello协议，服务器端会返回XMPP Server的greeting。HelloListener会收到greetingReceived()方法调用。
 
+关于hello-xmpp app程序，你可以参考官方开源仓库代码[hello-xmpp-app工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-xmpp/hello-xmpp-app)
+
 <br><br>
 #### 5.5.3 运行app测试扩展协议
 构建hello-xmpp-app。
@@ -1022,3 +1024,25 @@ cd hello-xmpp-app-0.0.1-RELEASE
 
 <br><br>
 ## 6 结论
+* Lithosphere平台是一个XMPP平台，并严重依赖于插件架构技术。<br><br>
+* 我们在这篇教程里，使用Granite XMPP Server的最小mini版本，它本身并不支持任何的通讯协议。即使最简单的ping（XEP-0199）协议也不支持。所有XMPP通讯功能，都通过插件机制来实现和提供。<br><br>
+* XMPP采用经典的C/S架构，客户端连接服务器，需要有服务器端的账号。在插件架构下，所有功能都可以通过插件机制灵活扩展。我们编写了一个插件来扩展Granite Server Console，帮助创建一个测试用户。<br><br>
+* XMPP的强大之处在于它的扩展性和灵活性。我们通过扩展Hello协议来演示在Lithosphere平台下，如何实现扩展协议，如何编写插件来扩展平台功能。<br><br>
+* 基于OXM技术，我们可以简单的定义协议对象，而不需要去理解XMPP协议细节。我们将协议对象封装在协议包中，协议包是标准的jar包，被Chalk客户端和Granite服务器端复用。<br><br>
+* 我们开发Granite服务器插件，通过Pipeline Extenders，我们扩展Granite服务器端功能。通过简单的注册CoC Parser和CoC Translator，Granite服务器就能够识别协议对象，并做正确的解析和翻译。我们注册协议的协议处理器XEP Processor。在协议处理器中，直接对解析好的业务对象进行逻辑处理。<br><br>
+* 对应于服务器端，我们在客户端也开发客户端插件来处理协议逻辑。我们定义客户端API接口，并提供接口实现。Chalk提供封装了XMPP协议细节的网络接口Chat Services，我们可以调用IQ Service，Message Service，Presence Service，Task Service等网络服务，来处理扩展协议相关细节。当然，我们也通过协议注册接口，将解析器、翻译器等信息注册到插件管理系统。<br><br>
+* 教程中的例子，看似简单。但要理解的是，所有的Lithosphere平台的功能，都是通过这样的机制扩展出来的。通过这套扩展机制，Lithosphere平台实现了RFC3921和部分XEPs，包括：
+	* RFC3921(XMPP IM)
+	* XEP-0199(XMPP Ping)
+	* XEP-0030(Service Discovery)
+	* XEP-0033(Extended Stanza Addressing)
+	* XEP-0203(Delayed Delivery)
+	* XEP-0004(Data Form)
+	* XEP-0059(Result Set Management)
+	* XEP-0077(In-Band Registration)
+	* XEP-0045(Multi-User Chat)
+	* XEP-0066(Out of Band Data)
+	* XEP-0114(Jabber Component Protocol)
+<br><br>
+* 当然，实时通讯显然不是Lithosphere平台的重点。在这套扩展机制下，我们开发了Sand的所有IoT平台功能。特别是Webcam插件和Friends协议，它们证明了Lithosphere平台的插件扩展机制，可以用于实现极其复杂的通讯逻辑。<br><br>
+* Lithosphere IoT平台，具备很好的灵活性，和极强的扩展性，适合用来开发复杂、灵活的IoT应用
