@@ -69,6 +69,7 @@ Lithosphere平台，已经内置实现了IBTR。基于服务器端和客户端�
 | GND     | 地线 |
 | VCC     | 5V电源 |
 | IN      | LED控制 |
+
 <br><br>
 我们需要将LED模块，通过树莓派硬件板上的GPIO接口，连接到硬件板上。
 <br><br>
