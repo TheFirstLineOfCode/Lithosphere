@@ -24,7 +24,7 @@ GPIO是英文General-Purpose Input/Output的缩写。<br><br>
 简单来说，GPIO就是硬件板上一组引针，这些引针可以用来控制电信号输入输出。<br><br>
 由于这些引针是可以编程来控制的，从而可以实现和外部的电路模块板通讯。<br><br>
 下图是Raspberry Pi Zero W上的GPIO接口。
-![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/gpio.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/gpio_pins.png)
 <br><br>
 在本教程中，我们使用GPIO来连接外部的LED模块，从而实现LED小灯的程序控制。
 
