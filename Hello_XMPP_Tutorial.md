@@ -288,7 +288,7 @@ hello-xmpp create-test-user
 
 <br><br>
 ### 4.1 创建hello-xmpp-app工程
-创建hello-xmpp-app目录，添加mave配置pom.xml文件。
+创建hello-xmpp-app目录，添加maven配置pom.xml文件。
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 
