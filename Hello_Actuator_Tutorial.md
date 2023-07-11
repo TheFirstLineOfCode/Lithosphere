@@ -16,7 +16,7 @@
 
 <br><br>
 ## 2 概念
-这篇教程，会涉及到硬件控制接口，以及IoT终端设备的分发部署。简单介绍相关概念如下。
+这篇教程，会涉及到IoT设备的硬件控制接口，以及IoT终端设备的分发部署。简单介绍相关概念如下。
 
 <br><br>
 ### 2.1 GPIO
@@ -29,23 +29,22 @@ GPIO是英文General-Purpose Input/Output的缩写。<br><br>
 在本教程中，我们使用GPIO来连接外部的LED模块，从而实现LED小灯的程序控制。
 
 <br><br>
-### 2.2 授权入网
+### 2.2 设备注册
 在真实的IoT应用中，当一个IoT设备从库房中拿出来时，它并不能接通电源后立马就开始工作。<br><br>
-基于安全性和利于管理的考虑，IoT设备要能够开始工作，需要经过一个“授权入网”的步骤。<br><br>
-在这个“授权入网”的过程中，应用一般会：
+基于安全性和利于管理的考虑，IoT设备要能够开始工作，需要经过一个“设备注册”的步骤。<br><br>
+在这个“设备注册”的过程中，应用一般会：
 * 检查设备的合法性
-* 检查设备是否在此时被允许入网
+* 检查设备是否在此时被允许进入网络
 * 登记设备相关信息到系统中
 * 配置设备 - 例如对设备进行网络配置；发放安全token等。
 
 <br><br>
-在不同的应用和不同标准中，“授权入网”可能会有不同的术语和叫法。<br><br>
-例如，在LoRaWAN标准中，“授权入网”被叫做"End Device Activation"。官方文档里，这样描述End Device Activation：<br>
+在不同的应用和不同标准中，“设备注册”可能会有不同的术语和叫法。<br><br>
+例如，在LoRaWAN标准中，“设备注册”被叫做"End Device Activation"。官方文档里，这样描述End Device Activation：<br>
 All end devices that participate in a LoRaWAN network must be activated. There are two methods of activation you can choose: over-the-air activation (OTAA) or activation by personalization (ABP).<br><br>
-Lithosphere IoT Platform基于XMPP通讯协议。XMPP里，对于参与IM网络的用户，需要先做用户注册。<br><br>
-在标准XMPP协议扩展XEP-0077(In-Band Registration)里，定义了如何实现IM用户在线注册的功能。<br><br>
-遵从XMPP的习惯，Lithosphere里的“授权入网”，被称为IBTR(In-Band Thing Registration)，智能物件在线注册。<br><br>
-Lithosphere平台，已经内置实现了IBTR。基于服务器端和客户端的IBTR插件，可以快速开发极度灵活的设备“授权入网”功能。<br><br>
+Lithosphere IoT Platform基于XMPP通讯协议。在标准XMPP协议扩展[XEP-0077 (In-Band Registration)](https://xmpp.org/extensions/xep-0077.html)里，定义了如何实现IM用户在线注册的功能。<br><br>
+遵从XMPP的习惯，Lithosphere IoT平台里的“设备注册”，被称为IBTR(In-Band Thing Registration)，即智能物件在线注册。<br><br>
+Lithosphere IoT平台，已经内置实现了IBTR功能。基于服务器端和客户端的IBTR插件，可以快速开发及灵活定制“设备注册”功能。<br><br>
 在本篇教程中，我们会看到相关的内容。
 
 <br><br>
@@ -135,7 +134,7 @@ sudo dpkg -i wiringpi-2.61-1-armhf.deb
 所以，我们最好定一个单独的协议包，已便于在后面客户端和服务器端复用这些协议对象。
 
 <br><br>
-#### 5.2.1 创建协议工程
+### 6.1 创建协议工程
 创建hello-actuator-protocol工程，pom.xml如下：
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -191,7 +190,7 @@ sudo dpkg -i wiringpi-2.61-1-armhf.deb
 >>>```
 
 <br><br>
-#### 5.2.2 定义协议对象
+### 6.2 定义协议对象
 在Hello，Actuator例子里，我们想用App来遥控IoT设备上的LED灯。我们希望可以遥控LED执行：亮灯、熄灯、闪灯。<br><br>
 为此，我们使用以下3个协议对象：
 TurnOn
@@ -249,17 +248,18 @@ public class Flash {
 >>><flash xmlns="urn:leps:things:simple-light" repeat=5/>
 >>>```
 ><br><br>
->* 不需要担心"urn:leps:things:simple-light"字符串太长了，会带来传输效率的低下。在Lithosphere IoT平台下，如果使用BXMPP技术，ProtocolObject(namespace="urn:leps:things:simple-light", localName="flash")这段协议头信息，会被转化成3字节的二进制协议信息。
+>* 不需要担心"urn:leps:things:simple-light"字符串太长了，会带来传输效率的低下。在Lithosphere IoT平台下，如果使用BXMPP技术，ProtocolObject(namespace="urn:leps:things:simple-light", localName="flash")这段协议头信息，会被转化成3字节长度的二进制协议信息。
 ><br><br>
->* TurnOn和TurnOff协议，表达一个不带任何参数的指令，所以它们被设计成不带任何实例属性的空对象。
+>* TurnOn和TurnOff，表达一个不带任何参数的指令，所以它们被设计成不带任何实例属性的空对象。
 
 <br><br>
-#### 5.2.3 定义Model Descriptor
+### 6.3 定义Model Descriptor
 让我们来给要控制的IoT设备，定义一个Model Descriptor。<br><br>
 为何需要定义Model Descriptor？<br><br>
 这是因为Lithosphere完全基于插件架构。在插件架构下，系统功能并不是写死固化的。当一个插件被部署时，它为系统提供了一组应用功能。当这个插件被卸载掉后，它所提供的功能就消失了。<br><br>
 正是因为这种插件架构的特性，默认系统是不认识任何IoT设备的，也不能识别任何IoT控制/数据协议。<br><br>
 当我们基于插件技术，使用XMPP扩展协议，开发了某种IoT设备的一组应用功能。我们需要使用平台提供的扩展点，将插件提供的应用功能注册到系统中。我们需要明确的告知系统：现在，我们有这些功能了，相关功能由XXX插件提供。<br><br>
+最好是能有一个从设备维度专门描述IoT设备的对象，能够便利我们将相关信息提供给系统。<br><br>
 这个事说起来啰嗦，实操起来其实比较简单。我们需要在协议包里，定义一个Model Descriptor类。
 ```
 public class HatModelDescriptor extends SimpleThingModelDescriptor {
@@ -288,7 +288,7 @@ public class HatModelDescriptor extends SimpleThingModelDescriptor {
 >* 这个IoT设备是一个Actuator（执行器）设备，它接受Action指令，然后执行指令对应的操作。它不是Sensor，不需要上报数据。它也不触发事件，不需要事件通知功能。所以构造器里的参数都是false，null。只有最后一个构造器参数，我们用createSupportedActions()，将这个Actuator设备支持的Action都登记到Model Descriptor中。当然，在这个例子里，IoT设备只支持3个指令，TurnOn，TurnOff，Flash。
 
 <br><br>
-#### 5.2.4 构建安装协议包
+### 6.4 构建安装协议包
 因为需要在后续开发客户端和服务器端插件包时，引用协议包，所以我们在hello-actuator-protocol工程里，执行构建安装指令，把协议包安装到本地maven仓库。
 ```
 cd hello-actuator-protocol
@@ -298,8 +298,8 @@ mvn clean install
 协议包已经开发完成，你可以参考官方开源仓库代码[hello-actuator-protocol协议包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-actuator/hello-actuator-protocol)
 
 <br><br>
-### 5.3 开发服务器端插件
-#### 5.3.1 服务器端插件工程
+## 7 开发服务器端插件
+### 7.1 服务器端插件工程
 创建hello-actuator-server目录，添加pom.xml文件。
 ```
 <?xml version="1.0" encoding="UTF-8"?>
@@ -348,7 +348,7 @@ mvn clean install
 >* 依赖hello-actuator-protocol协议包。
 
 <br><br>
-#### 5.3.2 实现IThingProvider
+### 7.2 实现IThingProvider
 ```
 @Extension
 public class ThingModelsProvider implements IThingModelsProvider {
@@ -368,10 +368,14 @@ public class ThingModelsProvider implements IThingModelsProvider {
 >* 请注意@Extension标注，它申明了这个类是PF4J的插件扩展。
 
 <br><br>
-#### 5.3.2 实现IThingRegistrationCustomizer
+### 7.3 实现IThingRegistrationCustomizer
+在这篇教程的前面章节，我们提到了“设备注册”。在Lithosphere平台里，“设备注册”被实现为IBTR（In-Band Thing Registration）协议。
+<br><br>
+Lithosphere IoT平台，提供一个IThingRegistrationCustomizer的接口，来允许开发人员定制设备注册的过程。<br><br>
+下面，我们来看看怎么使用IThingRegistrationCustomizer。
 ```
 @Extension
-public class ThingRegistrationCustomizer extends AbstractThingRegistrationCustomizer {
+public class ThingRegistrationCustomizer extends ThingRegistrationCustomizerAdapter {
 	private static final String HARD_CODED_REGISTRATION_CODE = "abcdefghijkl";
 	
 	@Override
@@ -381,5 +385,570 @@ public class ThingRegistrationCustomizer extends AbstractThingRegistrationCustom
 		
 		return HARD_CODED_REGISTRATION_CODE.equals(registrationCode);
 	}
+
+	@Override
+	public boolean isAuthorizationRequired() {
+		return false;
+	}
 }
 ```
+>**代码说明**
+>* 继承ThingRegistrationCustomizerAdapter，这个类提供了IThingRegistrationCustomizer接口的默认实现。
+><br><br>
+>* 重载了isUnregisteredThing方法，这个方法检查IoT设备的 Thing ID和Registration Code的合法性。我们看到，实现检查一个硬编码写死的Registration Code。
+><br><br>
+>* isAuthorizationRequired()，返回false。我们在这个例子中，只检查Thing ID和Registration Code的合法性。不做人工的设备注册授权。所以我们关掉Authorization功能。
+><br><br>
+>* @Extension标注申明这个类是PF4J的插件扩展。
+<br><br>
+### 7.4 编写插件配置文件
+在src/main/resources目录下，创建啊plugin.properties。
+```
+plugin.id=hello-actuator-server
+plugin.provider=TheFirstLineOfCode
+plugin.version=0.0.1-RELEASE
+plugin.dependencies=sand-server-things
+non-plugin.dependencies=hello-actuator-protocol
+```
+>**代码说明**
+>* plugin.dependencies，依赖sand-server-things插件。
+><br><br>
+>* non-plugin.dependencies，依赖hello-actuator-protocol协议包（非插件格式jar）。
+
+<br><br>
+### 7.5 构建部署服务器端插件
+构建hello-actuator-server插件包
+```
+cd hello-actuator-server
+mvn clean package
+```
+
+<br><br>
+将hello-actuator-server插件包和它依赖的hello-actuator-protocol包，把这两个jar包，copy到服务器的plugins目录下。
+```
+cp hello-actuator-protocol/target/hello-actuator-protocol-0.0.1-RELEASE.jar granite-lite-iot-1.0.3-RELEASE/plugins
+
+cp hello-actuator-server/target/hello-actuator-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.3-RELEASE/plugins
+```
+
+服务器端插件已经开发完成，你可以参考官方开源仓库代码[hello-actuator-server服务器端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-actuator/hello-actuator-server)
+
+<br><br>
+### 7.6 检查Granite Lite XMPP Server状态
+启动Granite Lite XMPP Server
+```
+cd granite-lite-iot-1.0.3
+java -jar granite-server-1.0.3-RELEASE.jar -console
+```
+带-console参数启动Granite Lite XMPP Server之后，能够看到Granite Server Console的界面。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console.png)
+
+<br><br>
+我们可以在Console输入services命令来检查Granite XMPP Server的状态。
+```
+$services
+
+```
+如果能看到所有的services的状态都是available，说明granite lite server已经被正常的启动了。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console_services.png)
+<br><br>
+可以用plugins命令，来检查可用的plugins。
+```
+$plugins
+```
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_lite_iot_server_console_plugins.png)
+
+<br><br>
+我们可以看到，hello-actuator-server插件已经被部署。<br><br>
+
+### 7.7 创建测试用户
+在这里，我们还需要解决一个问题。<br><br>
+
+我们想使用手机App来遥控IoT设备闪灯，我们使用XMPP技术来做这件事情。<br><br>
+
+在XMPP标准里，要在XMPP网络里进行通讯，你需要一个XMPP账户。无论你是人还是物，你都需要一个账户。你是人，需要一个User账户。你是物，你需要一个Thing（IoT）账户。<br><br>
+我们需要一个User账户，这样，我们才能够从手机App，连接到XMPP网络中，这才有可能通过XMPP网络去遥控IoT设备。<br><br>
+有一个简单的办法，可以创建User用户。<br><br>
+我们在Granite Lite IoT XMPP Server里，默认部署了sand-demo-server插件。这个插件用来支撑完整的sand-demo演示程序。使用plugins指令，可以看到Granite Lite IoT XMPP Server部署了sand-demo-server插件。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_plugin.png)
+<br><br>
+sand-demo-server在Granite Server Console里，提供了一个创建测试用户的指令，我们可以用它来创建测试用户。在Granite Server Console里，我们执行以下指令。
+```
+sand-demo create-test-users
+```
+<br><br>
+我们会看到，测试用户已经被创建。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_create_test_users.png)
+
+<br><br>
+我们在这个教程后面，会使用测试用户sand-demo来登录手机App，进行遥控闪灯操作。
+
+<br><br>
+使用exit指令，可以退出Granite Server Console，并关闭Granite XMPP Server。
+```
+$exit
+```
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console_exit.png)
+
+<br><br>
+## 8 开发设备端程序
+### 8.1 设备端工程
+创建hello-actuator-thing目录，添加pom.xml文件。
+```
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>com.thefirstlineofcode.sand</groupId>
+		<artifactId>sand-client</artifactId>
+		<version>1.0.0-BETA2</version>
+	</parent>
+
+	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloactuator</groupId>
+	<artifactId>hello-actuator-thing</artifactId>
+	<version>0.0.1-RELEASE</version>
+	<name>Hello actuator thing</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.thefirstlineofcode.chalk</groupId>
+			<artifactId>chalk-logger</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thefirstlineofcode.sand.client</groupId>
+			<artifactId>sand-client-edge</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.pi4j</groupId>
+			<artifactId>pi4j-core</artifactId>
+			<version>1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloactuator</groupId>
+			<artifactId>hello-actuator-protocol</artifactId>
+			<version>0.0.1-RELEASE</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.10.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>libs/</classpathPrefix>
+							<mainClass>com.thefirstlineofcode.lithosphere.tutorials.helloactuator.thing.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<appendAssemblyId>false</appendAssemblyId>
+					<descriptors>
+						<descriptor>src/assembly/descriptor.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+	<repositories>
+		<repository>
+			<id>com.thefirstlineofcode.releases</id>
+			<name>TheFirstLineOfCode Repository - Releases</name>
+			<url>http://120.25.166.188:9090/repository/maven-releases/</url>
+		</repository>
+	</repositories>
+</project>
+```
+
+>**代码说明**
+>* POM继承com.thefirstlineofcode.sand:sand-client，以便复用父POM里的依赖配置管理。
+><br><br>
+>* hello-actuator-thing是一个独立运行的Java程序。我们使用maven-assembly-plugin和maven-jar-plugin来打包和配置可这个可运行程序。
+><br><br>
+>* 依赖com.thefirstlineofcode.sand.client:sand-client-edge库，我们使用Edge库来帮助终端设备进行设备注册和连接服务器。<br>
+>>>```
+>>><dependency>
+>>>	<groupId>com.thefirstlineofcode.sand.client</groupId>
+>>>	<artifactId>sand-client-edge</artifactId>
+>>></dependency>
+>>>```
+><br><br>
+>* 依赖pi4j-core库。我们用Pi4J库来访问控制硬件板的GPIO接口。
+>>>```
+>>><dependency>
+>>>	<groupId>com.pi4j</groupId>
+>>>	<artifactId>pi4j-core</artifactId>
+>>>	<version>1.3</version>
+>>></dependency>
+>>>```
+>>>**注意**：我们使用1.3版本Pi4J。因为Pi4J v1.4和Pi4J v2.x需要JDK 11。而我们在树莓派Zero W上，只有JDK 8可以用。所以，我们使用Pi4J v1.3。
+>* 依赖hello-actautor-protocol协议包。
+>>>```
+>>><dependency>
+>>>	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloactuator</groupId>
+>>>	<artifactId>hello-actuator-protocol</artifactId>
+>>>	<version>0.0.1-RELEASE</version>
+>>></dependency>
+>>>```
+
+<br><br>
+### 8.2 硬件控制
+程序设计一个重要原则，责任原则。简单来说，我们将不同的责任划分到不同的接口和实现中，让它们各行其事。<br><br>
+在这里，我们也来划分责任。<br><br>
+我们先来关注硬件控制部分，我们想要控制IoT设备做亮灯、熄灯、闪灯。<br><br>
+Ok，先不管其它，我们来定义这个IoT设备的硬件控制的接口。<br><br>
+```
+public interface ISimpleLight {	
+	void turnOn();
+	void turnOff();
+	void flash(int repeat) throws ExecutionException;
+}
+```
+**注意：**
+这种控制硬件的接口，在概念里，我们把它叫做Thing Controller，智能物件控制器。
+<br><br>
+hello-actuator-thing的核心类HelloActuatorThing，我们让它实现ISimpleLight接口。
+```
+public class HelloActuatorThing implements ISimpleLight {
+	private GpioController gpio;
+	private GpioPinDigitalOutput ledPin;
+	
+	public HelloActuatorThing() {
+		configureGpio();
+	}
+	
+	private void configureGpio() {
+		gpio = GpioFactory.getInstance();
+		ledPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_08, "MyLED", PinState.LOW);
+		ledPin.setShutdownOptions(true, PinState.LOW);
+	}
+	
+	@Override
+	public void turnOn() {
+		ledPin.high();
+	}
+
+	@Override
+	public void turnOff() {
+		ledPin.low();
+	}
+
+	@Override
+	public void flash(int repeat) throws ExecutionException {
+		if (repeat <= 0 || repeat > 8)
+			throw new ExecutionException(-1);
+		
+		for (int i = 0; i < repeat; i++) {			
+			flash();
+			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				throw new ExecutionException(-2);
+			}
+		}
+	}
+	
+	private void flash() throws ExecutionException {
+		turnOn();
+		
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+			throw new ExecutionException(-2);
+		}
+		
+		turnOff();
+	}	
+}
+```
+>***代码说明*
+>* 在configureGpio()方法里，我们使用Pi4J库对GPIO进行配置。我们配置使用ledPin变量来对LED灯的IN接口进行控制。
+><br><br>
+>* 在turnOn方法中，我们调用ledPin.high()，拉高GPIO引针电压，这会让LED灯亮灯。对应的，在turnOff方法中，我们调用ledPin.low()来让LED灯熄灯。
+
+<br><br>
+Ok，现在，我们已经实现硬件控制了。
+
+<br><br>
+### 8.3 IoT通讯
+让我们来给IoT设备添加通讯能力。<br><br>
+我们使用sand-client-edge库，可以简化设备端程序的编写。<br><br>
+让HelloActuatorThing继承AbstractEdgeThing。
+```
+public class HelloActuatorThing extends AbstractEdgeThing implements ISimpleLight {
+	public static final String THING_MODEL = HatModelDescriptor.MODEL_NAME;
+	public static final String SOFTWARE_VERSION = "0.0.1-RELEASE";
+	
+	private IActuator actuator;
+	private GpioController gpio;
+	private GpioPinDigitalOutput ledPin;
+	
+	public HelloActuatorThing() {
+		super(THING_MODEL, streamConfig, true);
+		
+		configureGpio();
+	}
+	
+	@Override
+	public String getSoftwareVersion() {
+		return SOFTWARE_VERSION;
+	}
+	
+	@Override
+	protected void registerIotPlugins() {
+		chatClient.register(ActuatorPlugin.class);
+	}
+	
+	@Override
+	protected void startIotComponents() {
+		startActuator();
+	}
+	
+	private void configureGpio() {
+		... ...
+	}
+
+	private void startActuator() {
+		if (actuator == null) {			
+			actuator = chatClient.createApi(IActuator.class);
+			registerExecutors(actuator);
+		}
+		
+		actuator.start();
+	}
+	
+	private void registerExecutors(IActuator actuator) {
+		actuator.registerExecutor(TurnOn.class, TurnOnExecutor.class, this);
+		actuator.registerExecutor(TurnOff.class, TurnOffExecutor.class, this);
+		actuator.registerExecutorFactory(createFlashExecutorFactory());
+	}
+	
+	private IExecutorFactory<?> createFlashExecutorFactory() {
+		return new IExecutorFactory<Flash>() {
+			@Override
+			public Protocol getProtocol() {
+				return Flash.PROTOCOL;
+			}
+			
+			@Override
+			public Class<Flash> getActionType() {
+				return Flash.class;
+			}
+			
+			@Override
+			public IExecutor<Flash> create() {
+				return new FlashExecutor(HelloActuatorThing.this);
+			}
+		};
+	}
+	
+	@Override
+	protected void stopIotComponents() {
+		if (actuator != null) {			
+			actuator.stop();
+			actuator = null;
+		}
+	}
+	
+	@Override
+	public void turnOn() {
+		... ...
+	}
+
+	@Override
+	public void turnOff() {
+		... ...
+	}
+
+	@Override
+	public void flash(int repeat) throws ExecutionException {
+		... ...
+	}
+	
+	private void flash() throws ExecutionException {
+		... ...
+	}
+		
+	@Override
+	protected String loadThingId() {
+		return THING_MODEL + "-" + ThingsUtils.generateRandomId(8);
+	}
+	
+	@Override
+	protected String loadRegistrationCode() {
+		return "abcdefghijkl";
+	}
+}
+```
+> **代码说明**
+>* AbstractEdgeThing留下了一些抽象方法给子类来实现。这些抽象方法名字很直白，我们遵从方法名给出对应实现细节即可。
+><br><br>
+>* registerIotPlugins()方法，在这里登记我们要使用的插件。因为这个IoT设备是一个可执行指令的Actuator。所以我们只需要注册ActuatorPlugin插件。
+>>>```
+>>>protected void registerIotPlugins() {
+>>>	chatClient.register(ActuatorPlugin.class);
+>>>}
+>>>```
+><br><br>
+>* startIotComponents()方法，Edge Thing连接到服务器后，会调用这个方法来启动设备。在这里，我们需要把Actuator组件启动起来，Actuator组件来自ActuatorPlugin。<br>
+我们在startActuator()方法里，创建IActuator实例，并注册Executors，最后调用Actuator的start()方法。
+>>>```
+>>>protected void startIotComponents() {
+>>>	startActuator();
+>>>}
+>>>
+>>>private void startActuator() {
+>>>	if (actuator == null) {			
+>>>		actuator = chatClient.createApi(IActuator.class);
+>>>		registerExecutors(actuator);
+>>>	}
+>>>	
+>>>	actuator.start();
+>>>}
+>>>```
+><br><br>
+>* 在registerExecutors()方法里，我们给TurnOn，TurnOff，Flash指令，注册它们对应的执行器。<br><br>
+有两种注册执行器的API。第一种API，我们直接将Action指令类，和Executor指令类，登记到Actuator。<br><br>
+**注意：**
+这里registerExecutor()方法的最后一个参数，是Thing Controller。<br><br>
+依据设计原则中的责任原则，Thing Controller负责直接控制IoT设备的硬件接口。在这里，Thing Controller是ISimpleLigh。<br><br>
+HelloActuatorThing实现了这个接口（ISimpleLight），提供控制硬件的turnOn()，TurnOff()，flash()方法。<br><br>
+我们把HelloActuatorThing当做第三个参数传给Actuator，Thing Controller会被注入给Executor使用。
+>>>```
+>>>actuator.registerExecutor(TurnOn.class, TurnOnExecutor.class, this);
+>>>actuator.registerExecutor(TurnOff.class, TurnOffExecutor.class, this);
+>>>```
+><br><br>
+>* 第二种API，我们注册一个Executor Factory，由这个Factory来提供相关信息以及创建Executor，这样可以更灵活的处理Executor的创建。我们使用这种API来创建FlashExecutor。
+>>>```
+>>>... ...
+>>>	actuator.registerExecutorFactory(createFlashExecutorFactory());
+>>>... ...
+>>>
+>>>private IExecutorFactory<?> createFlashExecutorFactory() {
+>>>	return new IExecutorFactory<Flash>() {
+>>>		@Override
+>>>		public Protocol getProtocol() {
+>>>			return Flash.PROTOCOL;
+>>>		}
+>>>
+>>>		@Override
+>>>		public Class<Flash> getActionType() {
+>>>			return Flash.class;
+>>>		}
+>>>	
+>>>		@Override
+>>>		public IExecutor<Flash> create() {
+>>>			return new FlashExecutor(HelloActuatorThing.this);
+>>>		}
+>>>	};
+>>>}
+>>>```
+><br><br>
+>* 最后，我们来处理一下设备注册的对应逻辑。还记得吗，我们在服务器端的Registration Customizer里，在检查Registration Code合法性时，使用的是一个硬编码的Registration Code。<br><br>
+所以，在IoT设备端，我们需要使用这个硬编码的Registration Code去注册。<br><br>
+我们重载loadRegistrationCode()方法，用写死的"abcdefghijkl"作为Registration Code去进行注册。
+>>>```
+>>>protected String loadRegistrationCode() {
+>>>	return "abcdefghijkl";
+>>>}
+>>>```
+<br><br>
+设备端程序已经开发完成，你可以参考官方开源仓库代码[hello-actuator-thing设备端程序工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-actuator/hello-actuator-thing)
+
+<br><br>
+### 8.4 构建部署hello-actuator-thing
+用maven构建hello-actuator-thing
+```
+cd hello-actuator-thing
+mvn clean package
+```
+<br><br>
+将构建成功的设备端程序，copy到树莓派硬件板上。
+```
+scp target/hello-actuator-thing-0.0.1-RELEASE.tar.gz pi@192.168.1.180:/home/pi
+```
+**注意：**
+请将pi用户名，和树莓派网络ip 192.168.1.180，改为你自己环境的配置值。
+
+<br><br>
+### 8.5 启动thing程序
+登录到树莓派上
+```
+ssh pi@192.168.1.180
+```
+<br><br>
+运行thing程序
+```
+tar -xzvf hello-actuator-thing-0.0.1-RELEASE.tar.gz
+cd hello-actuator-thing-0.0.1-RELEASE
+java -jar hello-actuator-thing-0.0.1-RELEASE.jar --host=192.168.1.80
+```
+**说明**
+* 启动thing程序之前，记得要先启动Granite XMPP Server。
+* 第一次运行thing程序时，需要使用--host参数指定服务器地址。AbstractEdgeThing会记住程序启动参数，后续再启动thing程序，不需要再指定host。
+
+<br><br>
+程序启动后，能看到thing has started的提示。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/hello_actuator_thing_has_started.png)
+<br><br>
+可以使用exit命令来退出hello-actuator-thing程序。
+
+<br><br>
+## 9 使用手机App遥控IoT设备
+从头开发一个手机App比较繁琐，我们可以直接用Lithosphere平台提供的sand-demo App来遥控我们的IoT小灯。
+<br><br>
+点击这里下载[sand-demo App]()
+<br><br>
+如果想了解sand-demo App更多细节，可以参考开源仓库里的[sand-demo App程序源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-actuator/hello-actuator-thing)
+<br><br>
+将下载的sand-demo App安装到安卓手机上。
+<br><br>
+启动sand-demo App。点击配置传输通道链接，进入stream配置页面。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_login_page.png)
+<br><br>
+在传输通道配置页里，填写Granite XMPP Server的正确地址。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_configure_stream.jpg)
+<br><br>
+配置好传输通道后，回到登录页，使用sand-demo用户名来登录App。用户密码也是"sand-demo"。
+<br><br>
+登录后，可以看到hello-actuator-thing。点击“控制这个智能物件”，会看到下拉菜单里，有Flash，Turn On，Turn Off三个子菜单。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_control_hello-actuator-thing.jpg)
+<br><br>
+现在可以用手机App来控制hello-actuator-thing了。
+
+<br><br>
+## 10 总结

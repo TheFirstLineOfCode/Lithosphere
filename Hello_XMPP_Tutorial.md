@@ -59,7 +59,7 @@ $services
 ```
 $plugins
 ```
-![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console_plugins.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_lite_mini_server_console_plugins.png)
 <br><br>
 我们会看到，当前的服务器为最小部署版本，部署了最基本的5个插件：
 * granite-lite-auth
@@ -288,7 +288,7 @@ hello-xmpp create-test-user
 
 <br><br>
 ### 4.1 创建hello-xmpp-app工程
-创建hello-xmpp-app目录，添加maven配置pom.xml文件。
+创建hello-xmpp-app目录，添加pom.xml文件。
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -380,7 +380,7 @@ public class Main {
 >>>streamConfig.setResource("my_notebook");
 >>>```
 ><br><br>
->* IChatClien是Chalk库的核心API接口，使用它连接到服务器端。
+>* IChatClient是Chalk库的核心API接口，使用它连接到服务器端。
 
 <br><br>
 ### 4.3 运行测试代码
@@ -688,7 +688,7 @@ non-plugin.dependencies=hello-xmpp-protocol
 >>>Lithosphere对此的解决方案，是为PF4J增加一个non-plugin.dependencies的语法，对于不是插件包的依赖，可以使用这个配置语法来进行配置。
 
 <br><br>
-#### 5.3.5 构建部署协议包
+#### 5.3.5 构建部署服务器端插件
 构建hello-xmpp-server插件包
 ```
 cd hello-xmpp-server

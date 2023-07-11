@@ -17,7 +17,7 @@ Lithosphere IoT平台主要使用XMPP协议和插件架构技术。<br><br>
 让我们走进IoT的世界！<br><br>
 在这篇教程里，我们用一块Raspberry PI Zero W的板子，通过GPIO连接一个LED灯。<br><br>
 然后，我们使用Actuator插件，用App来控制这个IoT设备亮灯和闪灯。<br><br>
-在这篇教程里，我们还会涉及到IoT设备安全授权入网的相关内容。<br><br>
+在这篇教程里，我们还会涉及到IoT设备注册的相关内容。<br><br>
 [**Hello, LoRa!**](./Hello_LoRa_Tutorial.md)<br>
 IoT系统里，怎么能不出现IoT通讯协议呢？<br><br>
 在这篇教程里，我们来学习如何组网使用LoRa协议的通讯设备。<br><br>
