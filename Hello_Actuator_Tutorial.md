@@ -402,7 +402,7 @@ public class ThingRegistrationCustomizer extends ThingRegistrationCustomizerAdap
 >* @Extension标注申明这个类是PF4J的插件扩展。
 <br><br>
 ### 7.4 编写插件配置文件
-在src/main/resources目录下，创建啊plugin.properties。
+在src/main/resources目录下，创建plugin.properties。
 ```
 plugin.id=hello-actuator-server
 plugin.provider=TheFirstLineOfCode
@@ -472,7 +472,7 @@ $plugins
 我们在Granite Lite IoT XMPP Server里，默认部署了sand-demo-server插件。这个插件用来支撑完整的sand-demo演示程序。使用plugins指令，可以看到Granite Lite IoT XMPP Server部署了sand-demo-server插件。
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_plugin.png)
 <br><br>
-sand-demo-server在Granite Server Console里，提供了一个创建测试用户的指令，我们可以用它来创建测试用户。在Granite Server Console里，我们执行以下指令。
+sand-demo-server插件，在Granite Server Console里提供了一个创建测试用户的指令，我们可以用它来创建测试用户。在Granite Server Console里，我们执行以下指令。
 ```
 sand-demo create-test-users
 ```
@@ -515,10 +515,6 @@ $exit
 
 	<dependencies>
 		<dependency>
-			<groupId>com.thefirstlineofcode.chalk</groupId>
-			<artifactId>chalk-logger</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.thefirstlineofcode.sand.client</groupId>
 			<artifactId>sand-client-edge</artifactId>
 		</dependency>
@@ -536,16 +532,6 @@ $exit
 	
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.10.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -878,7 +864,7 @@ HelloActuatorThing实现了这个接口（ISimpleLight），提供控制硬件�
 >>>}
 >>>```
 ><br><br>
->* 最后，我们来处理一下设备注册的对应逻辑。还记得吗，我们在服务器端的Registration Customizer里，在检查Registration Code合法性时，使用的是一个硬编码的Registration Code。<br><br>
+>* 我们来处理一下设备注册的对应逻辑。还记得吗，我们在服务器端的Registration Customizer里，在检查Registration Code合法性时，使用的是一个硬编码的Registration Code。<br><br>
 所以，在IoT设备端，我们需要使用这个硬编码的Registration Code去注册。<br><br>
 我们重载loadRegistrationCode()方法，用写死的"abcdefghijkl"作为Registration Code去进行注册。
 >>>```
@@ -886,11 +872,53 @@ HelloActuatorThing实现了这个接口（ISimpleLight），提供控制硬件�
 >>>	return "abcdefghijkl";
 >>>}
 >>>```
+
+<br><br>
+### 8.4 主程序
+我们编写一个主程序来启动hello-actuator-thing。
+```
+public class Main {
+	private HelloActuatorThing simpleLight;
+	
+	public static void main(String[] args) {
+		new Main().run(args);
+	}
+
+	private void run(String[] args) {
+		if (args.length == 1 && args[0].equals("--help")) {
+			printUsage();
+			
+			return;
+		}
+		
+		... ...
+		
+		try {
+			simpleLight = new HelloActuatorThing();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			printUsage();
+			
+			return;
+		}
+		
+		... ...
+		
+		simpleLight.start();
+	}
+	
+	... ...
+}
+```
+
+>**代码说明**
+>* 很简单直白的代码，重要的是调用HelloActuatorThing的start()方法，将Edge Thing启动起来。
+
 <br><br>
 设备端程序已经开发完成，你可以参考官方开源仓库代码[hello-actuator-thing设备端程序工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-actuator/hello-actuator-thing)
 
 <br><br>
-### 8.4 构建部署hello-actuator-thing
+### 8.5 构建部署hello-actuator-thing
 用maven构建hello-actuator-thing
 ```
 cd hello-actuator-thing
@@ -905,7 +933,7 @@ scp target/hello-actuator-thing-0.0.1-RELEASE.tar.gz pi@192.168.1.180:/home/pi
 请将pi用户名，和树莓派网络ip 192.168.1.180，改为你自己环境的配置值。
 
 <br><br>
-### 8.5 启动thing程序
+### 8.6 启动thing程序
 登录到树莓派上
 ```
 ssh pi@192.168.1.180
@@ -918,11 +946,10 @@ cd hello-actuator-thing-0.0.1-RELEASE
 java -jar hello-actuator-thing-0.0.1-RELEASE.jar --host=192.168.1.80
 ```
 **说明**
-* 启动thing程序之前，记得要先启动Granite XMPP Server。
-* 第一次运行thing程序时，需要使用--host参数指定服务器地址。AbstractEdgeThing会记住程序启动参数，后续再启动thing程序，不需要再指定host。
-
-<br><br>
-程序启动后，能看到thing has started的提示。
+* 启动thing程序之前，记得要先启动Granite XMPP Server。<br><br>
+* 第一次运行thing程序时，需要使用--host参数指定服务器地址。AbstractEdgeThing会记住程序启动参数，后续再启动thing程序，不需要再指定host。<br><br>
+* 程序启动后，会连接到服务器进行设备注册，注册成功后，登录到服务器<br><br>
+一切就绪后，可以看到Thing thing has started的提示。
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/hello_actuator_thing_has_started.png)
 <br><br>
 可以使用exit命令来退出hello-actuator-thing程序。
@@ -932,6 +959,92 @@ java -jar hello-actuator-thing-0.0.1-RELEASE.jar --host=192.168.1.80
 从头开发一个手机App比较繁琐，我们可以直接用Lithosphere平台提供的sand-demo App来遥控我们的IoT小灯。
 <br><br>
 点击这里下载[sand-demo App]()
+<br><br>
+sand-demo App里大部分是常规的Android开发。创建菜单，画界面... ...
+<br><br>
+和IoT通讯相关的部分，是App使用Chalk的remoting插件来遥控IoT设备。
+<br><br>
+remoting插件的功能，是可以在远程设备上执行action指令。
+<br><br>
+remoting插件的使用较简单，以下代码，来自sand-demo App源码。
+```
+... ...
+	public void turnOn(JabberId target) {
+		logger.info("Turn on light {}.", target);
+		controlThing(target, new TurnOn(), "Turn on");
+	}
+... ...
+	private void controlThing(JabberId target, Object action, String actionDescription) {
+		IChatClient chatClient = ChatClientSingleton.get(this);
+		IRemoting remoting = chatClient.createApi(IRemoting.class);
+		remoting.execute(target, action, new RemotingCallback(this, actionDescription));
+	}
+... ...
+private static class RemotingCallback implements IRemoting.Callback {
+		private final Activity activity;
+		private final String actionDescription;
+
+		public RemotingCallback(Activity activity, String actionDescription) {
+			this.activity = activity;
+			this.actionDescription = actionDescription;
+		}
+
+		@Override
+		public void executed(Object xep) {
+			activity.runOnUiThread(() -> Toast.makeText(activity,
+					actionDescription + " executed.",
+					Toast.LENGTH_LONG).show());
+		}
+
+		@Override
+		public void occurred(StanzaError error) {
+			String errorText = actionDescription + " execution error: " +
+					(error.getText() == null ? error.toString() : error.getText().getText());
+			remotingErrorOccurred(activity, error, errorText);
+		}
+
+		@Override
+		public void timeout() {
+			activity.runOnUiThread(() -> Toast.makeText(activity,
+					actionDescription + " execution timeout.",
+					Toast.LENGTH_LONG).show());
+		}
+	}
+... ...
+```
+**代码说明**
+* 用chatClient创建IRemoting实例，然后调用IRemoting的execute()方法。方法3个参数，第一个参数是远程设备的地址；第二个参数是要执行的action对象（Protocol Object）；第三个参数，是RemotingCallback，我们用这个回调接口来处理远程指令执行结果。
+>>>```
+>>>IChatClient chatClient = ChatClientSingleton.get(this);
+>>>IRemoting remoting = chatClient.createApi(IRemoting.class);
+>>>remoting.execute(target, action, new RemotingCallback(this, actionDescription));
+>>>```
+><br><br>
+* 在RemotingCallback里，如果远程指令正常执行，会回调executed()方法；远程指令执行出错，会回调occurred()方法；远程指令执行超时（执行端未返回响应，不能确认指令是否执行成功），会调用timeout()方法。我们在这些回调方法里，做对应的处理。
+>>>```
+>>>... ...
+>>>@Override
+>>>public void executed(Object xep) {
+>>>	activity.runOnUiThread(() -> Toast.makeText(activity,
+>>>			actionDescription + " executed.",
+>>>			Toast.LENGTH_LONG).show());
+>>>}
+>>>
+>>>@Override
+>>>public void occurred(StanzaError error) {
+>>>	String errorText = actionDescription + " execution error: " +
+>>>			(error.getText() == null ? error.toString() error.getText().getText());
+>>>	remotingErrorOccurred(activity, error, errorText);
+>>>}
+>>>
+>>>@Override
+>>>public void timeout() {
+>>>	activity.runOnUiThread(() -> Toast.makeText(activity,
+>>>			actionDescription + " execution timeout.",
+>>>			Toast.LENGTH_LONG).show());
+>>>}
+>>>... ...
+>>>```
 <br><br>
 如果想了解sand-demo App更多细节，可以参考开源仓库里的[sand-demo App程序源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-actuator/hello-actuator-thing)
 <br><br>
@@ -952,3 +1065,13 @@ java -jar hello-actuator-thing-0.0.1-RELEASE.jar --host=192.168.1.80
 
 <br><br>
 ## 10 总结
+通过这篇教程，我们可以了解到以下的内容：
+* 我们可以通过IoT硬件板上的GPIO接口，来控制IoT设备的外接硬件模块。<br><br>
+* 开源的Pi4J库，可以帮助我们使用Java语言来访问树莓派上的GPIO接口。<br><br>
+* 在IoT的世界里，有不同的通讯协议可以选择。在互联网端，XMPP协议是一个很好的选择。<br><br>
+* 如果使用Lithosphere，基于OXM(Object/XMPP Mapping)技术，我们不需要去处理XML，也不需要了解XMPP协议的细节。我们简单的创建Protocol Object来表达通讯指令。<br><br>
+* Lithosphere基于插件架构，我们可以通过创建服务器端插件，将我们要管理的IoT设备注册到系统中。我们还可以定制设备注册过程，以应对真实项目的需求。<br><br>
+* 在IoT设备端，我们开发Thing程序。使用Sand的sand-client-edge库，可以简化设备注册，服务器连接过程。我们只要注册需要使用的插件，编写Thing端处理逻辑。<br><br>
+* 对于Actuator（执行器）类型的IoT设备，我们使用actuator插件来简化开发。我们登记设备可执行的指令，并且注册指令所对应的Executor（执行器）。<br><br>
+* 我们在手机App端，使用remoting插件来远程执行指令，遥控IoT设备。<br><br>
+* 这篇教程里的内容，全部基于Java平台，只有Java，不涉及其它编程语言。
