@@ -958,7 +958,7 @@ java -jar hello-actuator-thing-0.0.1-RELEASE.jar --host=192.168.1.80
 ## 9 使用手机App遥控IoT设备
 从头开发一个手机App比较繁琐，我们可以直接用Lithosphere平台提供的sand-demo App来遥控我们的IoT小灯。
 <br><br>
-点击这里下载[sand-demo App]()
+点击这里下载[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA2/sand-demo.apk)
 <br><br>
 sand-demo App里大部分是常规的Android开发。创建菜单，画界面... ...
 <br><br>
@@ -1046,19 +1046,19 @@ private static class RemotingCallback implements IRemoting.Callback {
 >>>... ...
 >>>```
 <br><br>
-如果想了解sand-demo App更多细节，可以参考开源仓库里的[sand-demo App程序源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-actuator/hello-actuator-thing)
+如果想了解sand-demo App更多细节，可以参考开源仓库里的[sand-demo App程序源码](https://github.com/TheFirstLineOfCode/sand/tree/main/demo/app-android)
 <br><br>
 将下载的sand-demo App安装到安卓手机上。
 <br><br>
-启动sand-demo App。点击配置传输通道链接，进入stream配置页面。
+启动sand-demo App。点击配置传输通道链接，进入stream配置页面。<br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_login_page.png)
 <br><br>
-在传输通道配置页里，填写Granite XMPP Server的正确地址。
+在传输通道配置页里，填写Granite XMPP Server的正确地址。<br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_configure_stream.jpg)
 <br><br>
 配置好传输通道后，回到登录页，使用sand-demo用户名来登录App。用户密码也是"sand-demo"。
 <br><br>
-登录后，可以看到hello-actuator-thing。点击“控制这个智能物件”，会看到下拉菜单里，有Flash，Turn On，Turn Off三个子菜单。
+登录后，可以看到hello-actuator-thing。点击“控制这个智能物件”，会看到下拉菜单里，有Flash，Turn On，Turn Off三个子菜单。<br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_control_hello-actuator-thing.jpg)
 <br><br>
 现在可以用手机App来控制hello-actuator-thing了。
