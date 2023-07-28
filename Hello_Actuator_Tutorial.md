@@ -8,7 +8,7 @@
 **Java = 8**（树莓派端）<br>
 **Java >= 11**（服务器端）<br>
 **Granite Lite IoT XMPP Server**<br>
-点击这里下载[Granite Lite IoT XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.3-RELEASE/granite-lite-iot-1.0.3-RELEASE.zip)<br>
+点击这里下载[Granite Lite IoT XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/granite-lite-iot-1.0.4-RELEASE.zip)<br>
 **Raspberry Pi Zero W硬件板**<br>
 **LED模块**<br>
 **几颗杜邦线**<br>
@@ -131,7 +131,7 @@ sudo dpkg -i wiringpi-2.61-1-armhf.deb
 关于OXM，可以参考概念文档中的[OXM章节](./Concepts.md#OXM)
 <br><br>
 使用OXM，我们会定义的协议对象，这些协议对象，在客户端和服务器端，都会被使用。协议对象是可复用的。<br><br>
-所以，我们最好定一个单独的协议包，已便于在后面客户端和服务器端复用这些协议对象。
+所以，我们最好开发一个单独的协议包，已便于在后面客户端和服务器端复用这些协议对象。
 
 <br><br>
 ### 6.1 创建协议工程
@@ -215,22 +215,22 @@ Flash
 public class Flash {
 	public static final Protocol PROTOCOL = new Protocol("urn:leps:things:simple-light", "flash");
 	
-	private int repeat;
+	private Integer repeat;
 	
 	public Flash() {
-		repeat = 1;
+		this(null);
 	}
 	
-	public Flash(int repeat) {
+	public Flash(Integer repeat) {
 		setRepeat(repeat);
 	}
 	
-	public int getRepeat() {
+	public Integer getRepeat() {
 		return repeat;
 	}
 
-	public void setRepeat(int repeat) {
-		if (repeat < 1)
+	public void setRepeat(Integer repeat) {
+		if (repeat != null && repeat < 1)
 			throw new IllegalArgumentException("Attribute repeat must be a positive integer.");
 		
 		this.repeat = repeat;
@@ -238,6 +238,9 @@ public class Flash {
 	
 	@Override
 	public String toString() {
+		if (repeat == null)
+			return "Flash[repeat=null]";
+		
 		return String.format("Flash[repeat=%d]", repeat);
 	}
 }
@@ -312,7 +315,7 @@ mvn clean install
 	<parent>
 		<groupId>com.thefirstlineofcode.sand</groupId>
 		<artifactId>sand-server</artifactId>
-		<version>1.0.0-BETA2</version>
+		<version>1.0.0-BETA3</version>
 	</parent>
 
 	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloactuator</groupId>
@@ -426,9 +429,9 @@ mvn clean package
 <br><br>
 将hello-actuator-server插件包和它依赖的hello-actuator-protocol包，把这两个jar包，copy到服务器的plugins目录下。
 ```
-cp hello-actuator-protocol/target/hello-actuator-protocol-0.0.1-RELEASE.jar granite-lite-iot-1.0.3-RELEASE/plugins
+cp hello-actuator-protocol/target/hello-actuator-protocol-0.0.1-RELEASE.jar granite-lite-iot-1.0.4-RELEASE/plugins
 
-cp hello-actuator-server/target/hello-actuator-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.3-RELEASE/plugins
+cp hello-actuator-server/target/hello-actuator-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.4-RELEASE/plugins
 ```
 
 服务器端插件已经开发完成，你可以参考官方开源仓库代码[hello-actuator-server服务器端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-actuator/hello-actuator-server)
@@ -437,8 +440,8 @@ cp hello-actuator-server/target/hello-actuator-server-0.0.1-RELEASE.jar granite-
 ### 7.6 检查Granite Lite XMPP Server状态
 启动Granite Lite XMPP Server
 ```
-cd granite-lite-iot-1.0.3
-java -jar granite-server-1.0.3-RELEASE.jar -console
+cd granite-lite-iot-1.0.4
+java -jar granite-server-1.0.4-RELEASE.jar -console
 ```
 带-console参数启动Granite Lite XMPP Server之后，能够看到Granite Server Console的界面。
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console.png)
@@ -505,7 +508,7 @@ $exit
 	<parent>
 		<groupId>com.thefirstlineofcode.sand</groupId>
 		<artifactId>sand-client</artifactId>
-		<version>1.0.0-BETA2</version>
+		<version>1.0.0-BETA3</version>
 	</parent>
 
 	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloactuator</groupId>
@@ -599,7 +602,7 @@ $exit
 >>>	<version>1.3</version>
 >>></dependency>
 >>>```
->>>**注意**：我们使用1.3版本Pi4J。因为Pi4J v1.4和Pi4J v2.x需要JDK 11。而我们在树莓派Zero W上，只有JDK 8可以用。所以，我们使用Pi4J v1.3。
+>>>**注意**：我们使用1.3版本Pi4J。因为Pi4J v1.4和Pi4J v2.x需要JDK 11。而我们在树莓派Zero W上，只安装了JDK 8。所以，我们使用Pi4J v1.3。
 >* 依赖hello-actautor-protocol协议包。
 >>>```
 >>><dependency>
@@ -958,7 +961,8 @@ java -jar hello-actuator-thing-0.0.1-RELEASE.jar --host=192.168.1.80
 ## 9 使用手机App遥控IoT设备
 从头开发一个手机App比较繁琐，我们可以直接用Lithosphere平台提供的sand-demo App来遥控我们的IoT小灯。
 <br><br>
-点击这里下载[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA2/sand-demo.apk)
+你可以自己来构建sand-demo App，这是一个标准的Andriod工程，请用Andriod Studio来打开它。[sand-demo App源码](https://github.com/TheFirstLineOfCode/sand/tree/main/demo/app-android)位于sand工程的demo/app-android子目录下。<br><br>
+你可以直接下载构建好的[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA3/sand-demo.apk)安装使用。
 <br><br>
 sand-demo App里大部分是常规的Android开发。创建菜单，画界面... ...
 <br><br>
@@ -1046,9 +1050,9 @@ private static class RemotingCallback implements IRemoting.Callback {
 >>>... ...
 >>>```
 <br><br>
-如果想了解sand-demo App更多细节，可以参考开源仓库里的[sand-demo App程序源码](https://github.com/TheFirstLineOfCode/sand/tree/main/demo/app-android)
+如果想了解sand-demo App更多细节，请参考开源仓库里的[sand-demo App程序源码](https://github.com/TheFirstLineOfCode/sand/tree/main/demo/app-android)
 <br><br>
-将下载的sand-demo App安装到安卓手机上。
+将构建好或直接下载的sand-demo App安装到安卓手机上。
 <br><br>
 启动sand-demo App。点击配置传输通道链接，进入stream配置页面。<br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_login_page.png)
@@ -1058,7 +1062,7 @@ private static class RemotingCallback implements IRemoting.Callback {
 <br><br>
 配置好传输通道后，回到登录页，使用sand-demo用户名来登录App。用户密码也是"sand-demo"。
 <br><br>
-登录后，可以看到hello-actuator-thing。点击“控制这个智能物件”，会看到下拉菜单里，有Flash，Turn On，Turn Off三个子菜单。<br>
+登录后，可以看到注册成功后hello-actuator-thing。点击“控制这个智能物件”，会看到下拉菜单里，有Flash，Turn On，Turn Off三个子菜单。<br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/sand_demo_control_hello-actuator-thing.jpg)
 <br><br>
 现在可以用手机App来控制hello-actuator-thing了。

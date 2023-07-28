@@ -7,20 +7,20 @@
 ## 1 前置条件
 **Java >= 11**<br><br>
 **Granite Lite Mini XMPP Server**<br>
-点击这里下载[Granite Lite Mini XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.3-RELEASE/granite-lite-mini-1.0.3-RELEASE.zip)
+点击这里下载[Granite Lite Mini XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/granite-lite-mini-1.0.4-RELEASE.zip)
 
 <br><br>
 ## 2 检查Granite Lite Mini XMPP Server
 ### 2.1 解压Granite Lite Mini Server
 ```
-unzip granite-lite-mini-1.0.3-RELEASE.zip
+unzip granite-lite-mini-1.0.4-RELEASE.zip
 ```
 
 <br><br>
 ### 2.2 启动Granite Lite XMPP Server
-#### 2.2.1 配置Domain
-根据XMPP规范要求，每个XMPP Server必须指定Domain。<br><br>
-用户可以在${GRANITE_LITE_SERVER_HOME}/configuration/server.ini文件中配置Domain。<br><br>
+#### 2.2.1 配置Domain Name
+根据XMPP规范要求，每个XMPP Server必须指定Domain Name。<br><br>
+用户可以在${GRANITE_LITE_SERVER_HOME}/configuration/server.ini文件中配置Domain Name。<br><br>
 在server.ini文件中，找到domain.name的配置行
 ```
 domain.name=localhost
@@ -40,8 +40,8 @@ domain.name=192.168.1.80
 #### 2.2.2 启动并检查Granite Lite XMPP Server的状态
 启动Granite Lite XMPP Server
 ```
-cd granite-lite-mini-1.0.3
-java -jar granite-server-1.0.3-RELEASE.jar -console
+cd granite-lite-mini-1.0.4
+java -jar granite-server-1.0.4-RELEASE.jar -console
 ```
 带-console参数启动Granite Lite XMPP Server之后，能够看到Granite Server Console的界面。
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console.png)
@@ -61,7 +61,7 @@ $plugins
 ```
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_lite_mini_server_console_plugins.png)
 <br><br>
-我们会看到，当前的服务器为最小部署版本，部署了最基本的5个插件：
+我们会看到，当前的服务器为最小部署版本，部署了最基础的5个插件：
 * granite-lite-auth
 * granite-lite-dba
 * granite-lite-pipeline
@@ -80,7 +80,7 @@ $exit
 XMPP协议基于典型的C/S架构模式，客户端需要一个服务器上的账号，才能登录到服务器进行通讯。<br><br>
 初始状态的Granite XMPP Server，是没有任何用户的。<br><br>
 如何在Granite XMPP Server上创建一个用户呢？<br><br>
-有很多方法可以创建用户。比如，我们可以部署IBR插件。IBR插件实现XEPs协议XEP-0077（In-Band Registration），提供IM用户在线注册功能。<br><br>
+有很多方法可以创建用户。比如，我们可以部署IBR插件。IBR插件实现XEPs协议[XEP-0077（In-Band Registration）](https://xmpp.org/extensions/xep-0077.html)，提供IM用户在线注册功能。<br><br>
 在这里，我们采用一个更简单的方案。Granite XMPP Server完全基于插件架构。我们可以通过编写插件，扩展Granite Server Console的功能，来帮助实现创建用户的任务。
 
 <br><br>
@@ -211,7 +211,7 @@ public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
 >>>public class HelloXmppCommandsProcessor extends AbstractCommandsProcessor {
 >>>```
 >>这里的@Extension标注来自PF4J插件框架，表示HelloXmppCommandsProcessor是一个插件扩展。我们在Granite项目中，使用了PF4J插件框架来为XMPP Server提供插件管理功能。<br>
->>关于PF4J插件框架d的更多信息，可以参考[PF4J官方网站](https://pf4j.org/)<br><br>
+>>关于PF4J插件框架的更多信息，可以参考[PF4J官方网站](https://pf4j.org/)<br><br>
 >>在这里，我们只要简单的理解，@Extension表示HelloXmppCommandsProcessor是一个ICommandProcessor的扩展，这个扩展会给Granite Server Console贡献功能。
 ><br><br>
 >* 我们看到打了@BeanDependency标注的一个IAccountManager实例引用。
@@ -255,15 +255,15 @@ mvn clean package
 #### 3.4.2 部署插件到Granite Lite Server
 将插件包copy到服务器plugins目录下。
 ```
-cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.3/plugins
+cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.4/plugins
 ```
 
 <br><br>
 #### 3.4.3 创建测试用户
 启动Granite Lite XMPP Server
 ```
-cd granite-lite-mini-1.0.3
-java -jar granite-server-1.0.3-RELEASE.jar -console
+cd granite-lite-mini-1.0.4
+java -jar granite-server-1.0.4-RELEASE.jar -console
 ```
 
 <br><br>
@@ -300,7 +300,7 @@ hello-xmpp create-test-user
 	<parent>
 		<groupId>com.thefirstlineofcode.chalk</groupId>
 		<artifactId>com.thefirstlineofcode.chalk.parent</artifactId>
-		<version>1.0.1-RELEASE</version>
+		<version>1.0.2-RELEASE</version>
 	</parent>
 
 	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloxmpp</groupId>
@@ -330,7 +330,7 @@ hello-xmpp create-test-user
 >>><parent>
 >>>	<groupId>com.thefirstlineofcode.chalk</groupId>
 >>>	<artifactId>com.thefirstlineofcode.chalk.parent</artifactId>
->>>	<version>1.0.1-RELEASE</version>
+>>>	<version>1.0.2-RELEASE</version>
 >>></parent>
 >>>```
 ><br><br>
@@ -393,8 +393,8 @@ mvn clean package
 <br><br>
 #### 4.3.2 启动Granite Lite Mini Server
 ```
-cd granite-lite-mini-1.0.3-RELEASE
-java -jar granite-server-1.0.3-RELEASE.jar -console
+cd granite-lite-mini-1.0.4-RELEASE
+java -jar granite-server-1.0.4-RELEASE.jar -console
 ```
 
 <br><br>
@@ -550,13 +550,10 @@ public class Hello {
 >>>```
 >>>而NotNull是OXM框架提供的一个Validator标签，它检查greeting字段不能为null。
 ><br><br>
->* OXM框架提供了很多标注，用于定制XMPP协议的XML文档。请阅读<br>
-[Basalt项目文档](https://github.com/TheFirstLineOfCode/basalt)<br>
-了解更多信息。
+>* OXM框架提供了很多标注，用于定制XMPP协议的XML文档。请参考Basalt项目文档了解更多信息。
 ><br><br>
 >* 我们定义了一个静态协议字段PROTOCOL。因为我们后面需要注册插件扩展时，会经常需要使用到协议信息。定义这么一个公有静态协议字段，会方便后续的扩展注册。
->>关于协议(Protocol)，可以参考概念文档里的<br>
-[Protocol and Protocol Chain](./Concepts.md#Protocol)
+>>关于协议(Protocol)，可以参考概念文档里的[Protocol and Protocol Chain](./Concepts.md#Protocol)
 
 <br><br>
 #### 5.2.3 构建安装协议包
@@ -594,8 +591,7 @@ public class PipelineExtendersContributor extends PipelineExtendersConfigurator 
 ```
 > **代码说明**
 >* PipelineExtendersContributor通过继承抽象类PipelineExtendersConfigurator，实现configure抽象方法来配置pipeline extenders扩展。<br><br>
->* Pipeline Extenders是服务器端的主要扩展点接口。Granite服务器除了使用插件架构之外，在设计中，还使用了Pipeline架构设计。Granite Framework提供了一组Pipeline Extenders扩展点，用于扩展Granite插件功能。更多相关信息，可以参考Granite开发文档的<br>
-[Granite Pipeline Extenders章节](http://TheFirstLineOfCode/Lithosphere/granite/dev_guide.md#Extenders)
+>* Pipeline Extenders是服务器端的主要扩展点接口。Granite服务器除了使用插件架构之外，在设计中，还使用了Pipeline架构设计。Granite Framework提供了一组Pipeline Extenders扩展点，用于扩展Granite插件功能。更多相关信息，可以参考Granite开发文档。
 ><br><br>
 >* 类名上的@Extension表示这是一个PF4J的扩展。<br><br>
 >* 我们在configure方法中扩展了3个Pipeline Extenders。<br>
@@ -606,11 +602,9 @@ public class PipelineExtendersContributor extends PipelineExtendersConfigurator 
 >>>```
 >>>在这里，我们使用PROTOCOL_CHAIN_HELLO协议链和Hello协议类，来注册协议对象解析器。<br><br>
 >>>我们使用Hello协议对象的类对象，来注册协议翻译器。<br><br>
->>>关于协议链(Protocol Chain)，可以参考概念文档里的<br>
-[Protocol and Protocol Chain](./Concepts.md#Protocol)
+>>>关于协议链(Protocol Chain)，可以参考概念文档里的[Protocol and Protocol Chain](./Concepts.md#Protocol)
 >>><br><br>
->>>关于协议解析器和协议翻译器，可以参考概念文档里的<br>
-[协议解析器和协议翻译器](./Concepts.md#Parser)
+>>>关于协议解析器和协议翻译器，可以参考概念文档里的[Protocol Parser and Translator](./Concepts.md#Protocol Parser)
 >>><br><br>
 >>>我们还注册了一个单实例的Xep Processor，HelloProcessor用来处理客户端发过来的Hello协议。
 >>>```
@@ -666,8 +660,7 @@ public class HelloProcessor implements IXepProcessor<Iq, Hello>, IConfigurationA
 >>>	</error>
 >>></iq>
 >>>```
->>>关于Granite的错误处理，请参考Granite开发文档的<br>
->>>[错误处理章节](http://github.com/TheFirstLineOfCode/granite/dev_guide.md#Error)
+>>>关于Granite的错误处理，请参考Granite开发文档。
 
 <br><br>
 #### 5.3.4 编写插件配置文件
@@ -698,9 +691,9 @@ mvn clean package
 <br><br>
 将hello-xmpp-server插件包和它依赖的hello-xmpp-protocol包，把这两个jar包，copy到服务器的plugins目录下。
 ```
-cp hello-xmpp-protocol/target/hello-xmpp-protocol-0.0.1-RELEASE.jar granite-lite-mini-1.0.3-RELEASE/plugins
+cp hello-xmpp-protocol/target/hello-xmpp-protocol-0.0.1-RELEASE.jar granite-lite-mini-1.0.4-RELEASE/plugins
 
-cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.3-RELEASE/plugins
+cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.4-RELEASE/plugins
 ```
 
 服务器端插件已经开发完成，你可以参考官方开源仓库代码[hello-xmpp-server服务器端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-xmpp/hello-xmpp-server)
@@ -720,7 +713,7 @@ cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-min
 	<parent>
 		<groupId>com.thefirstlineofcode.chalk</groupId>
 		<artifactId>com.thefirstlineofcode.chalk.parent</artifactId>
-		<version>1.0.1-RELEASE</version>
+		<version>1.0.2-RELEASE</version>
 	</parent>
 
 	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloxmpp</groupId>
@@ -756,7 +749,7 @@ cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-min
 >><parent>
 >>	<groupId>com.thefirstlineofcode.chalk</groupId>
 >>	<artifactId>com.thefirstlineofcode.chalk.parent</artifactId>
->>	<version>1.0.1-RELEASE</version>
+>>	<version>1.0.2-RELEASE</version>
 >></parent>
 >>```
 ><br><br>
@@ -864,7 +857,7 @@ public class HelloXmppPlugin implements IPlugin {
 ```
 > **代码说明**
 >* 实现IPlugin接口。<br><br>
->* 我们在init方法里，注册Hello协议对象的解析器和翻译器。<br>
+>* 我们在init方法里，注册Hello协议对象的解析器和翻译器。我们使用系统内置的CoC Parser和CoC Translator。CoC的Parser和Translator使用命名约定来翻译XMPP协议文档<br>
 >>```
 >>chatSystem.registerTranslator(Hello.class,
 >>		new CocTranslatorFactory<>(Hello.class));
@@ -872,8 +865,6 @@ public class HelloXmppPlugin implements IPlugin {
 >>		new IqProtocolChain(Hello.PROTOCOL),
 >>		new CocParserFactory<>(Hello.class));
 >>```
->>关于协议解析器和协议翻译器，可以参考概念文档里的<br>
-[协议解析器和协议翻译器](http://xxxxx)
 ><br><br>
 >* 我们为插件注册插件API和API实现。
 >>```
@@ -1012,6 +1003,7 @@ mvn clean package
 cd target
 tar -xzvf hello-xmpp-app-0.0.1-RELEASE.tar.gz
 cd hello-xmpp-app-0.0.1-RELEASE
+java -jar hello-xmpp-app-0.0.1-RELEASE.jar
 ```
 
 <br><br>
@@ -1024,8 +1016,8 @@ cd hello-xmpp-app-0.0.1-RELEASE
 
 <br><br>
 ## 6 结论
-* Lithosphere平台是一个XMPP平台，并严重依赖于插件架构技术。<br><br>
-* 我们在这篇教程里，使用Granite XMPP Server的最小mini版本，它本身并不支持任何的通讯协议。即使最简单的ping（XEP-0199）协议也不支持。所有XMPP通讯功能，都通过插件机制来实现和提供。<br><br>
+* Lithosphere平台是一个XMPP平台，并重度依赖于插件架构技术。<br><br>
+* 我们在这篇教程里，使用Granite XMPP Server的最小mini版本，它本身并不支持任何的通讯协议。即使最简单的[XMPP Ping（XEP-0199）](https://xmpp.org/extensions/xep-0199.html)协议也不支持。所有XMPP通讯功能，都通过插件机制来实现和提供。<br><br>
 * XMPP采用经典的C/S架构，客户端连接服务器，需要有服务器端的账号。在插件架构下，所有功能都可以通过插件机制灵活扩展。我们编写了一个插件来扩展Granite Server Console，帮助创建一个测试用户。<br><br>
 * XMPP的强大之处在于它的扩展性和灵活性。我们通过扩展Hello协议来演示在Lithosphere平台下，如何实现扩展协议，如何编写插件来扩展平台功能。<br><br>
 * 基于OXM技术，我们可以简单的定义协议对象，而不需要去理解XMPP协议细节。我们将协议对象封装在协议包中，协议包是标准的jar包，被Chalk客户端和Granite服务器端复用。<br><br>
@@ -1045,4 +1037,4 @@ cd hello-xmpp-app-0.0.1-RELEASE
 	* XEP-0114(Jabber Component Protocol)
 <br><br>
 * 当然，实时通讯显然不是Lithosphere平台的重点。在这套扩展机制下，我们开发了Sand的所有IoT平台功能。特别是Webcam插件和Friends协议，它们证明了Lithosphere平台的插件扩展机制，可以用于实现极其复杂的通讯逻辑。<br><br>
-* Lithosphere IoT平台，具备很好的灵活性，和极强的扩展性，适合用来开发复杂、灵活的IoT应用
+* Lithosphere IoT平台，具备非常好的灵活性，和极强的扩展性，适合用来开发复杂、灵活的IoT应用。

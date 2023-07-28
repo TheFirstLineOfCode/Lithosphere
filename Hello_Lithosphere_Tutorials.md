@@ -25,7 +25,7 @@ IoT系统里，怎么能不出现IoT通讯协议呢？<br><br>
 我们用一块Arduino UNO R3硬件板来连接LED灯。并使用Mud通讯库来让这个IoT终端通过安全授权后加入LoRa网络。<br><br>
 同样，在最后，我们使用App来遥控这个使用LoRa协议的终端节点。<br><br>
 [**Hello, Sensor!**](./Hello_Sensor_Tutorial.md)<br>
-Sensor是IoT应用里常见的设备。<br><br>
+Sensor是IoT应用里最常见的设备。<br><br>
 在这篇教程里，我们使用一块Arduino Micro板，通过GPIO连接到一个温度传感器模块。<br><br>
 我们通过使用Lithosphere平台自带的Report协议，通过LoRa网关，定时上报温度数据到服务器。<br><br>
 最后，我们做一个事，我们在服务器端将温度数据推送到App端，这样，我们就可以在App上，查看实时温度了。<br><br>
