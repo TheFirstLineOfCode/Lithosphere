@@ -98,7 +98,7 @@ pom.xml的内容如下：
 	<parent>
 		<groupId>com.thefirstlineofcode.granite</groupId>
 		<artifactId>com.thefirstlineofcode.granite</artifactId>
-		<version>1.0.3-RELEASE</version>
+		<version>1.0.4-RELEASE</version>
 	</parent>
 
 	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloxmpp</groupId>
@@ -129,7 +129,7 @@ pom.xml的内容如下：
 >>><parent>
 >>>	<groupId>com.thefirstlineofcode.granite</groupId>
 >>>	<artifactId>com.thefirstlineofcode.granite</artifactId>
->>>	<version>1.0.3-RELEASE</version>
+>>>	<version>1.0.4-RELEASE</version>
 >>></parent>
 >>>```
 ><br><br>
@@ -595,7 +595,10 @@ public class PipelineExtendersContributor extends PipelineExtendersConfigurator 
 ><br><br>
 >* 类名上的@Extension表示这是一个PF4J的扩展。<br><br>
 >* 我们在configure方法中扩展了3个Pipeline Extenders。<br>
->>> 注册了Hello协议对象的协议解析器和协议翻译器。
+>>> 我们双向注册了Hello协议对象的Protocol Parser和Protocol Translator。<br>
+>>> 这是因为Server端需要双向解析翻译Hello协议对象。这意味着，Server端既需要解析客户端传输过来的Hello协议消息，又会向客户端返回Hello协议消息。<br>
+所以，我们既要注册做协议解析的Protocol Parser，又需要注册做协议翻译的Protocol Translator。<br><br>
+不需要编写parser和translator，我们可以直接使用系统内置的CoC Parser和CoC Translator。
 >>>```
 >>>configurator.registerCocParser(PROTOCOL_CHAIN_HELLO, Hello.class);
 >>>configurator.registerCocTranslator(Hello.class);
@@ -1017,7 +1020,7 @@ java -jar hello-xmpp-app-0.0.1-RELEASE.jar
 <br><br>
 ## 6 结论
 * Lithosphere平台是一个XMPP平台，并重度依赖于插件架构技术。<br><br>
-* 我们在这篇教程里，使用Granite XMPP Server的最小mini版本，它本身并不支持任何的通讯协议。即使最简单的[XMPP Ping（XEP-0199）](https://xmpp.org/extensions/xep-0199.html)协议也不支持。所有XMPP通讯功能，都通过插件机制来实现和提供。<br><br>
+* 我们在这篇教程里，使用Granite XMPP Lite Server的最小mini版本，它本身并不支持任何的通讯协议。即使最简单的[XMPP Ping（XEP-0199）](https://xmpp.org/extensions/xep-0199.html)协议也不支持。所有XMPP通讯功能，都通过插件机制来实现和提供。<br><br>
 * XMPP采用经典的C/S架构，客户端连接服务器，需要有服务器端的账号。在插件架构下，所有功能都可以通过插件机制灵活扩展。我们编写了一个插件来扩展Granite Server Console，帮助创建一个测试用户。<br><br>
 * XMPP的强大之处在于它的扩展性和灵活性。我们通过扩展Hello协议来演示在Lithosphere平台下，如何实现扩展协议，如何编写插件来扩展平台功能。<br><br>
 * 基于OXM技术，我们可以简单的定义协议对象，而不需要去理解XMPP协议细节。我们将协议对象封装在协议包中，协议包是标准的jar包，被Chalk客户端和Granite服务器端复用。<br><br>
