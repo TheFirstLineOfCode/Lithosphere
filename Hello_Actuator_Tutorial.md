@@ -12,7 +12,7 @@
 **Raspberry Pi Zero W硬件板**<br>
 **LED模块**<br>
 **几颗杜邦线**<br>
-![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/hello_actuator_hardwares.jpg)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/hello_actuator_all_hardwares.jpg)
 
 <br><br>
 ## 2 概念
