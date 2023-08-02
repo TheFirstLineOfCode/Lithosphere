@@ -11,7 +11,8 @@
 点击这里下载[Granite Lite IoT XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/granite-lite-iot-1.0.4-RELEASE.zip)<br>
 **Raspberry Pi Zero W硬件板**<br>
 **LED模块**<br>
-**几颗杜邦线**<br>
+**几颗杜邦线**<br><br>
+下图是这个教程中使用到的硬件。
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/hello_actuator_all_hardwares.jpg)
 
 <br><br>
@@ -73,14 +74,14 @@ Lithosphere IoT平台，已经内置实现了IBTR功能。基于服务器端和�
 我们需要将LED模块，通过树莓派硬件板上的GPIO接口，连接到硬件板上。
 <br><br>
 如何对接呢？让我们我们来看看树莓派的GPIO接口。
-![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/connect_led_to_raspbery_pi_by_gpio.png)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/connect_led_to_raspbery_pi_using_gpio.png)
 <br><br>
 我们将LED的VCC接口，接在GPIO的5V Powerd引脚上。
 我们将LED的GND接口，接在GPIO的Ground引脚上。
-我们将LED的IN接口，接在GPIO 2引脚上。
+我们将LED的IN接口，接在GPIO 8引脚上。
 <br><br>
 接好后，看上去是这样的。
-![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/connect_led_to_raspberry_pi_by_gpio_2.jpg)
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/led_connected_to_raspberry_pi.jpg)
 
 <br><br>
 ## 5 配置硬件板基础软件环境
@@ -215,32 +216,29 @@ Flash
 public class Flash {
 	public static final Protocol PROTOCOL = new Protocol("urn:leps:things:simple-light", "flash");
 	
-	private Integer repeat;
+	private int repeat;
 	
 	public Flash() {
-		this(null);
+		this(1);
 	}
 	
-	public Flash(Integer repeat) {
+	public Flash(int repeat) {
 		setRepeat(repeat);
 	}
 	
-	public Integer getRepeat() {
+	public int getRepeat() {
 		return repeat;
 	}
 
-	public void setRepeat(Integer repeat) {
-		if (repeat != null && repeat < 1)
-			throw new IllegalArgumentException("Attribute repeat must be a positive integer.");
+	public void setRepeat(int repeat) {
+		if (repeat < 1)
+			throw new IllegalArgumentException("Attribute repeat must be a non-zero positive integer.");
 		
 		this.repeat = repeat;
 	}
 	
 	@Override
 	public String toString() {
-		if (repeat == null)
-			return "Flash[repeat=null]";
-		
 		return String.format("Flash[repeat=%d]", repeat);
 	}
 }
@@ -267,7 +265,7 @@ public class Flash {
 ```
 public class HatModelDescriptor extends SimpleThingModelDescriptor {
 	public static final String MODEL_NAME = "HAT";
-	public static final String DESCRIPTION = "Hello acuator thing";
+	public static final String DESCRIPTION = "Hello Acuator Thing";
 	
 	public HatModelDescriptor() {
 		super(MODEL_NAME, DESCRIPTION, false, null, null, createSupportedActions());
@@ -403,6 +401,7 @@ public class ThingRegistrationCustomizer extends ThingRegistrationCustomizerAdap
 >* isAuthorizationRequired()，返回false。我们在这个例子中，只检查Thing ID和Registration Code的合法性。不做人工的设备注册授权。所以我们关掉Authorization功能。
 ><br><br>
 >* @Extension标注申明这个类是PF4J的插件扩展。
+
 <br><br>
 ### 7.4 编写插件配置文件
 在src/main/resources目录下，创建plugin.properties。
@@ -433,7 +432,7 @@ cp hello-actuator-protocol/target/hello-actuator-protocol-0.0.1-RELEASE.jar gran
 
 cp hello-actuator-server/target/hello-actuator-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.4-RELEASE/plugins
 ```
-
+<br><br>
 服务器端插件已经开发完成，你可以参考官方开源仓库代码[hello-actuator-server服务器端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-actuator/hello-actuator-server)
 
 <br><br>

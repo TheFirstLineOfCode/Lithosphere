@@ -1,17 +1,725 @@
-## Hello, Lithosphere!!!
-按照这个行业的惯例，我们总是应该从Hello, XXX!开始。<br><br>
-Hello, Lithosphere是专门为新手准备的一系列教程。<br><br>
-教程一共6篇，每一篇讲一个IoT开发中的主题。我们在教程中学习如何在Lithosphere IoT平台上，实现这个主题的相关功能。教程包含文章及软硬件示例。<br><br>
-按照顺序阅读和学习后，会对Lithosphere IoT平台有一个直观、大概的了解。<br><br>
-这6篇教程，分别是：<br>
-[**Hello, XMPP**](./Hello_XMPP_Tutorial.md)
+## Hello, LoRa!!!
+欢迎来到IoT的世界。让我们来学习和了解IoT世界里最精彩和有趣的部分。<br><br>
+在这篇教程里，我们会搭建和部署一个经典的、完整的IoT应用网络。<br><br>
+我们搭建一个LoRa网络。<br><br>
+我们使用Mud库来帮助MCU硬件板接入到LoRa网络中。<br><br>
+在LoRa网关端，我们使用LoRa Gateway插件来简化网关的开发。LoRa Gateway会给终端MCU硬件板动态分配地址（LoRa DAC插件），并把它添加为下级节点（Concentrator插件）。<br><br>
+最后，我们依然通过手机App，来遥控MCU硬件板上的LED，亮灯、熄灯、闪灯。
 
-[**Hello, Actuator**](./Hello_Actuator_Tutorial.md)
+<br><br>
+## 1 前置条件：
+**Java >= 11**<br>
+**Granite Lite IoT XMPP Server**<br>
+点击这里下载[Granite Lite IoT XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/granite-lite-iot-1.0.4-RELEASE.zip)<br>
+**Raspberry Pi 3A+硬件板**<br>
+**Arduino Micro硬件板**<br>
+**LED模块**<br>
+**LoRa模块**<br>
+**一把杜邦线**<br><br>
+下图是这个教程中使用到的硬件。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/hello_lora_hardwares.jpg)
 
-[**Hello, LoRa**](./Hello_LoRa_Tutorial.md)
+### ***提示***
+在学习这篇教程之前，我们假设读者已经具备以下的基础知识：
+* 了解IoT（物联网）相关基础概念。
+* 熟悉Linux技术，会安装树莓派操作系统。
+* 知道GPIO是什么，了解相关基础知识。
+* 熟悉Java语言，有C语言基础。
+* 了解掌握的Arduino IDE的基本使用。
 
-[**Hello, Sensor**](./Hello_Sensor_Tutorial.md)
+在这篇教程里，我们不会再去花时间讲解以上的基础知识。<br><br>
+建议在学习这篇教程之前，先学习[Hello, Actuator教程](./Hello_Actuator_Tutorial.md)。<br><br>
+如果你不了解Arduino IDE的使用，可以读官方网站这篇[Getting Started with Arduino IDE 2](https://docs.arduino.cc/software/ide-v2/tutorials/getting-started-ide-v2)。
 
-[**Hello, Friends**](./Hello_Friends_Tutorial.md)
+<br><br>
+## 2 概念
+### 2.1 UART
+UART是Universal Asynchronous Receiver/Transmitter。<br><br>
+中文名通用异步收发器协议。<br><br>
+UART是一种硬件串口通讯协议，常被用于连接嵌入式硬件板和外部模块之间的通讯。<br><br>
+当使用UART在两个设备之间进行通讯时，须将设备1的TX接到设备2的RX，将设备1的RX接到设备2的TX。如下图：
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/uart_two_way_communication.png)
 
-[**Hello, WebRTC**](./Hello_XMPP_Tutorial.md)
+<br><br>
+### 2.2 Concentrator
+在IoT系统中，集线器（Concentrator）是指可以添加和管理下级IoT设备的中心节点设备。
+
+<br><br>
+### 2.3 LoRa DAC
+LoRa DAC是是LoRa Dynamic Address Configuration的缩写。<br><br>
+中文为LoRa动态地址配置协议。<br><br>
+在同一个LoRa网络中，如果想要精确控制每一个LoRa中终端节点，需要给每个终端节点配置不同的LoRa地址。<br><br>
+这和TCP/IP网络很像，在本地局域网内，需要给每个主机节点配置不同的IP地址。<br><br>
+地址配置，有静态配置和动态配置两种方法，在TCP/IP网络中，我们使用DHCP服务来动态分配IP地址，简化网络的配置操作。<br><br>
+在LoRa网络中，目前还缺少动态分配地址的相关协议。<br><br>
+Lithsphere为解决这个问题，提供了LoRa DAC协议。并内置实现了LoRa DAC协议的LoRa DAC Client和LoRa DAC Service的组件。
+
+<br><br>
+### 2.4 LoRa网关
+#### 2.4.1 为何需要LoRa网关
+LoRa协议并不兼容TCP/IP。<br><br>
+所以使用LoRa协议的IoT终端节点，并不能直接连接到互联网中。<br><br>
+为了让LoRa终端节点连接到互联网，我们需要使用LoRa网关设备。<br><br>
+LoRa网关设备，在IoT网络这一端，使用LoRa协议，连接LoRa终端节点。<br><br>
+在互联网端，LoRa网关通过WiFi或者运营商网络（4G、5G，....）、连接到互联网云端服务器。<br><br>
+在Lithospere里，LoRa Gateway插件，使用Concentrator插件管理下级LoRa终端节点，提供互联网连通服务。<br><br>
+LoRa Gateway插件还使用LoRa DAC插件提供的LoRa DAC服务，来分配和管理LoRa终端节点地址。
+
+<br><br>
+#### 2.4.2 LoRa网关工作模式
+LoRa网关有两种工作模式，DAC模式和ROUTER模式。<br><br>
+这是因为Lithospere中的LoRa网关插件，被设计成了可执行成多功能任务的设备，它具备以下两个功能：
+* ROUTER功能<br>
+LoRa网关，在使用ROUTER工作模式时，可以帮助LoRa网络中的终端节点，连接到互联网服务器。在这个工作模式下，LoRa网关实际上起到了一个连接LoRa网络和Internet网络的路由器作用。
+* DAC功能<br>
+LoRa网关，在使用DAC工作模式时，它其实是一个辅助组网LoRa网络的工具。<br><br>
+使用LoRa协议组网时，一个比较啰嗦的事情，是如何给每个终端节点，分配一个在LoRa网络里唯一、不冲突的LoRa地址。<br><br>
+当然，我们可以给LoRa模块静态配置地址，这个就需要严格做设备和地址的分配管理，以避免LoRa组网地址冲突。<br><br>
+在工厂里组装LoRa协议智能设备时，还必须有一个给LoRa终端设备配置静态地址的流程，将被管理的不冲突、唯一地址，配置到LoRa协议智能设备中。<br><br>
+另外一种方案是在组网时，给终端设备动态分配地址，这类似于在TCP/IP网络里使用DHCP协议。问题在于，LoRa网络协议，目前没有动态地址分配相关的协议。<br><br>
+Lithosphere提供了LoRa DAC协议，来帮助简化LoRa组网过程。当LoRa网关处于DAC工作模式下时，它被用于配置和组网LoRa网络。<br><br>
+Lithosphere目前的版本，这两种工作模式，不能同时并发使用。<br><br>
+我们在本教程案例中，会使用到ChangeWorkingMode指令，来遥控LoRa网关切换工作模式，来跑通整个案例。
+
+
+<br><br>
+### 2.5 TUXP
+TUXP是Things Unified and Extensiable Protocol。<br><br>
+中文为智能物件统一和可扩展协议。<br><br>
+为何会有TUXP？<br><br>
+这是因为，在IoT应用中，我们通常会面对多端和多协议带来的复杂性。<br><br>
+在IoT应用中，终端部署地点和部署环境，较传统互联网和移动互联网来说，更为复杂和多变。<br><br>
+而且在IoT应用架构上，由于引入了IoT专用通讯协议，往往需要部署IoT网关节点来帮助连接到互联网的通讯。<br><br>
+较传统互联网应用来说，IoT应用引入了更多端（移动端、服务器端、IoT网关端、终端节点端）和更多协议（BlueTooth，WiFi，LoRa，ZigBee，JSON, XML，MQTT，....）。<br><br>
+为了解决IoT应用多端和多协议带来的复杂性问题，Lithosphere平台采用了TUXP。<br><br>
+TUXP是一组面向IoT通讯的XMPP扩展协议。<br><br>
+目前，TUXP包括以下一些子协议：
+* IBTR Protocol
+物件在线注册协议
+* Notification Protocol<br>
+物件事件通知协议。
+* Execution Protocol<br>
+远程控制执行协议。
+* Report Protocol<br>
+传感器数据上报协议。
+* LoRa DAC<br>
+LoRa动态地址分配协议。
+* Friends Protocol<br>
+友物件事件监听协议
+* ... ...
+
+<br><br>
+Lithosphere在IoT应用中，统一使用TUXP协议来简化多端和多协议问题。<br><br>
+基于Lithosphere来做IoT应用开发，其它所有IoT相关协议都被屏蔽掉了，我们只使用TUXP。<br><br>
+No LoRa，No JSON，No XML，No MQTT，No HTTP，... ...<br><br>
+Only TUXP。
+
+<br><br>
+## 3 开发协议包
+我们总是先要开发协议包。<br><br>
+本教程中开发协议包过程，和[Hello, Actuator教程开发协议包](./Hello_Actuator_Tutorial.md#开发协议包)中类似。<br><br>
+只有些细节区别。
+<br><br>
+### 3.1 创建协议工程
+创建hello-lora-protocol工程，pom.xml如下：
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    ... ...
+
+	<groupId>com.thefirstlineofcode.lithosphere.tutorials.hellolora</groupId>
+	<artifactId>hello-lora-protocol</artifactId>
+	<name>Hello LoRa protocol</name>
+	<version>0.0.1-RELEASE</version>
+	
+    ... ...
+	
+</project>
+```
+
+> **代码说明**
+>* 除了协议包的groupId和artifactId不一样之外，其它内容和[Hello, Actuator教程创建协议工程](./Hello_Actuator_Tutorial.md#创建协议工程)中的pom.xml完全相同。不再赘述。
+
+<br><br>
+### 3.2 定义协议对象
+和[Hello, Actuator教程定义协议对象](./Hello_Actuator_Tutorial.md#定义协议对象)中完全相同。不再赘述。
+
+<br><br>
+### 3.3 定义Model Descriptor
+在这个教程案例中，我们有2种型号智能物件需要登记到服务器：
+* LoRa智能网关
+* 可控终端LED小灯
+
+<br><br>
+以下代码定义可控终端LED小灯类型描述器。
+```
+public class HltModelDescriptor extends SimpleThingModelDescriptor {
+	public static final String MODEL_NAME = "HLT";
+	public static final String DESCRIPTION = "Hello LoRa thing";
+	
+	public HatModelDescriptor() {
+		super(MODEL_NAME, DESCRIPTION, false, null, null, createSupportedActions());
+	}
+	
+	private static Map<Protocol, Class<?>> createSupportedActions() {
+		Map<Protocol, Class<?>> supportedActions = new HashMap<>();
+		supportedActions.put(Flash.PROTOCOL, Flash.class);
+		supportedActions.put(TurnOn.PROTOCOL, TurnOn.class);
+		supportedActions.put(TurnOff.PROTOCOL, TurnOff.class);
+		
+		return supportedActions;
+	}
+}
+```
+> **代码说明**
+>* 和[Hello, Actuator教程定义Model Descriptor](./Hello_Actuator_Tutorial.md#定义Model Descriptor)类似，只是设备型号名改为了HLT（Hello LoRa Thing）。不再赘述。
+
+<br><br>
+以下代码定义LoRa网关类型描述器。
+```
+public class HlgModelDescriptor extends SimpleThingModelDescriptor {
+	public static final String MODEL_NAME = "HLG";
+	public static final String DESCRIPTION = "Hello LoRa Gateway";
+	
+	public HlgModelDescriptor() {
+		super(MODEL_NAME, DESCRIPTION, true, null, null, createSupportedActions());
+	}
+	
+	private static Map<Protocol, Class<?>> createSupportedActions() {
+		Map<Protocol, Class<?>> supportedActions = new HashMap<>();
+		supportedActions.put(ChangeWorkingMode.PROTOCOL, ChangeWorkingMode.class);
+		
+		return supportedActions;
+	}
+}
+```
+> **代码说明**
+>* 设备型号名为HLG（Hello LoRa Gateway）。
+>* LoRa网关，只支持一个Action，ChangeWorkingMode，用来遥控LoRa网关切换工作模式。
+>* 不需要在协议包中定义ChangeWorkingMode对象。因为LoRa Gateway网关插件中已经内置了ChangeWorkingMode协议对象，我们可以使用系统自带的这个协议对象。
+
+### 3.4 构建安装协议包
+因为需要在后续开发客户端和服务器端插件包时，引用协议包，所以我们在hello-lora-protocol工程里，执行构建安装指令，把协议包安装到本地maven仓库。
+```
+cd hello-lora-protocol
+mvn clean install
+```
+<br><br>
+协议包已经开发完成，你可以参考官方开源仓库代码[hello-lora-protocol协议包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-lora/hello-lora-protocol)
+
+<br><br>
+## 4 开发服务器插件
+### 4.1 服务器端插件工程
+创建hello-lora-server目录，添加pom.xml文件。
+```
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+    ... ...
+
+	<groupId>com.thefirstlineofcode.lithosphere.tutorials.hellolora</groupId>
+	<artifactId>hello-lora-server</artifactId>
+	<version>0.0.1-RELEASE</version>
+	<name>Hello LoRa server plugin</name>
+
+	... ...
+</project>
+```
+> **代码说明**
+>* 除了服务器插件包的groupId和artifactId不一样之外，其它内容和[Hello, Actuator教程服务器端插件工程](./Hello_Actuator_Tutorial.md#服务器端插件工程)中的pom.xml完全相同。不再赘述。
+
+<br><br>
+### 4.2 实现IThingProvider
+```
+@Extension
+public class ThingModelsProvider implements IThingModelsProvider {
+
+	@Override
+	public IThingModelDescriptor[] provide() {
+		return new IThingModelDescriptor[] {
+			new HlgModelDescriptor(),
+			new HltModelDescriptor()
+		};
+	}
+
+}
+```
+>**代码说明**
+>* 注册HLG和HLT设备到服务器。
+>>>```
+>>>public IThingModelDescriptor[] provide() {
+>>>  return new IThingModelDescriptor[] {
+>>>         new HlgModelDescriptor(),
+>>>         new HltModelDescriptor()
+>>>     };
+>>>}
+>>>```
+
+<br><br>
+### 4.3 实现IThingRegistrationCustomizer
+```
+@Extension
+public class ThingRegistrationCustomizer extends ThingRegistrationCustomizerAdapter {
+	private static final String HARD_CODED_REGISTRATION_CODE = "abcdefghijkl";
+	
+	@Override
+	public boolean isUnregisteredThing(String thingId, String registrationCode) {
+		if (!super.isUnregisteredThing(thingId, registrationCode))
+			return false;
+		
+		return HARD_CODED_REGISTRATION_CODE.equals(registrationCode);
+	}
+	
+	@Override
+	public boolean isAuthorizationRequired() {
+		return false;
+	}
+	
+	@Override
+	public boolean isConfirmationRequired() {
+		return false;
+	}
+}
+```
+>**代码说明**
+>* 和Hello, Actuator教程案例里的ThingRegistrationCustomizer相比，只多了一个isConfirmationRequired方法，返回false值。
+>>>```
+>>>public boolean isConfirmationRequired() {
+>>>		return false;
+>>>}
+>>>```
+>>>我们在Hello，Actuator教程里，提到了设备注册的概念。<br><br>
+>>>我们在sAuthorizationRequired()方法中返回false，禁止掉了Edge设备（直连Internet服务器的设备）的人工授权步骤。禁止人工授权后，设备仅需要通过Thing ID和Registration Code合法性检查，就会自动注册到服务器<br><br>
+>>>对于非直连Internet服务器的设备，例如在这个案例中的HLT（Hello LoRa Thing）设备，它是通过LoRa网关来连接Internet服务器的。则需要在isConfirmationRequired()方法中返回false，来禁止掉了此类设备的人工授权步骤。<br><br>
+>* 同样的，我们检查设备的Registration Code必须为"abcdefghijkl"。
+
+### 4.4 编写插件配置文件
+在src/main/resources目录下，创建plugin.properties。
+```
+plugin.id=hello-lora-server
+plugin.provider=TheFirstLineOfCode
+plugin.version=0.0.1-RELEASE
+plugin.dependencies=sand-server-things
+non-plugin.dependencies=sand-protocols-lora-gateway,hello-lora-protocol
+```
+>**代码说明**
+>* 和[Hello, Actuator教程服务器编写插件配置文件](./Hello_Actuator_Tutorial.md#编写插件配置文件)类似，仅有细节区别，不再赘述。
+
+<br><br>
+### 4.5 构建部署服务器端插件
+构建hello-lora-server插件包
+```
+cd hello-lora-server
+mvn clean package
+```
+<br><br>
+将hello-lora-server插件包和它依赖的hello-lora-protocol包，把这两个jar包，copy到服务器的plugins目录下。
+```
+cp hello-lora-protocol/target/hello-lora-protocol-0.0.1-RELEASE.jar granite-lite-iot-1.0.4-RELEASE/plugins
+
+cp hello-lora-server/target/hello-lora-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.4-RELEASE/plugins
+```
+<br><br>
+服务器端插件已经开发完成，你可以参考官方开源仓库代码[hello-lora-server服务器端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-lora/hello-lora-server)
+
+<br><br>
+### 7.6 其它服务器端工作
+#### 7.6.1 检查Granite Lite XMPP Server状态
+和[Hello, Actuator教程检查Granite Lite XMPP Server状态](./Hello_Actuator_Tutorial.md#检查Granite Lite XMPP Server状态)类似，不再赘述。
+
+<br><br>
+#### 7.6.2 创建测试用户
+和[Hello, Actuator教程创建测试用户](./Hello_Actuator_Tutorial.md#创建测试用户)类似，不再赘述。
+
+<br><br>
+## 5 连接LoRa网关硬件
+让我们来做些硬件组装的工作。<br><br>
+
+我们来看看LoRa网关用到的LoRa模块长啥样。<br><br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/as32_ttl_100.jpg)
+<br><br>
+这个LoRa模块型号AS32-TTL-100，在淘宝上买，零售价还挺贵的，30块钱一个。
+<br><br>
+我们可以看到，它有7个引脚：
+| 引脚名        | 作用 |
+| --------- | ---------- |
+| GND       | 地线 |
+| VCC       | 5V电源 |
+| MD0       | 模块配置引脚0 |
+| MD1       | 模块配置引脚1 |
+| AUX       | 模块状态指示引脚 |
+| RXD       | UART串口通讯RXD引脚，接硬件板上TX引脚 |
+| TXD       | UART串口通讯TXD引脚，接硬件板上RX引脚 |
+
+<br><br>
+再来看树莓派硬件板这一端。<br><br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/connect_lora_module_to_raspbery_pi_using_gpio.png.png)
+<br><br>
+LoRa模块上的MD0、MD1控制引脚，以及AUX状态指示引脚，可以接到树莓派任意的有效GPIO引脚上。在本教程案例里，我们把这3个引脚接到了树莓派板的GPIO_02，GPIO_03，GPIO_04引脚上。<br><br>
+树莓派硬件板接上LoRa模块之后，看上去是这样的。<br><br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/lora_module_connected_to_raspberry_pi.jpg)
+
+<br><br>
+## 6 配置树莓派环境
+安装了纯净RaspBerry Pi OS操作系统的树莓派，还需要做一些环境配置。
+
+<br><br>
+### 6.1 安装JDK
+接上电源，启动树莓派。<br><br>
+使用ssh登录到树莓派上，然后安装默认的JDK。树莓派OS默认安装的JDK版本是Open JDK11。
+```
+ssh pi@192.168.1.180
+sudo apt-get update
+sudo apt-get install default-jdk
+```
+
+<br><br>
+### 6.2 安装pigpio库
+Pi4J通过采用JNI技术访问C库，来提供GPIO，Serial口通讯等功能。<br><br>
+从V2版本开始，Pi4J放弃了使用WiringPi库，改用pigpio库作为控制GPIO的底层C库。<br><br>
+我们需要先安装pigpio库，才能让Pi4J正常工作。<br><br>
+按照以下的步骤安装pigpio库。
+
+<br><br>
+### 6.3 配置UART
+
+#### 6.3.1 启用UART
+编辑/boot/config.txt文件。
+```
+sudo vi /boot/config.txt
+```
+<br><br>
+在文件结尾添加以下的两行内容。
+```
+enable_uart=1
+dtoverlay=disable-bt
+```
+**说明：**
+* Raspberry Pi板上有两种类型的UART，PL011和mini UART。其中PL011是全功能的UART；mini UART是一个缩减了功能的版本。<br>
+在本教程中使用的Raspberry Pi 3A+版本硬件板，默认将PL011 UART被配置给了蓝牙使用。<br>
+我们想使用PL011 UART来连接LoRa模块，需要调整树莓派的默认配置，我们需要关掉蓝牙，让它把PL011 UART让出来用。所以，需要以下的这行配置，关掉蓝牙。
+>>>```
+>>>dtoverlay=disable-bt
+>>>```
+
+<br><br>
+#### 6.3.2 移除蓝牙相关系统服务
+我们已经在配置中，关掉蓝牙了。但可以再彻底一些，我们移除掉蓝牙相关的系统服务。
+```
+sudo systemctl disable hciuart
+sudo systemctl disable bluetooth
+```
+
+#### 6.3.3 禁止UART串口控制台输出
+编辑/boot/cmdline.txt文件
+```
+sudo vi /boot/cmdline.txt
+```
+将console==serial0,xxxx的内容删除掉，这里的xxxx是配置的波特率。<br><br>
+在我的树莓派3A+板上，需要被移除的内容为console=serial0,115200。
+
+<br><br>
+## 6 开发LoRa网关程序
+让我们来开发LoRa网关程序。
+
+<br><br>
+### 6.1 网关端工程
+创建hello-lora-gateway目录，添加pom.xml文件。
+```
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>com.thefirstlineofcode.sand</groupId>
+		<artifactId>sand-client</artifactId>
+		<version>1.0.0-BETA3</version>
+	</parent>
+
+	<groupId>com.thefirstlineofcode.lithosphere.tutorials.hellolora</groupId>
+	<artifactId>hello-lora-gateway</artifactId>
+	<version>0.0.1-RELEASE</version>
+	<name>Hello LoRa Gateway</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.thefirstlineofcode.sand.protocols</groupId>
+			<artifactId>sand-protocols-bxmpp-extensions</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thefirstlineofcode.chalk</groupId>
+			<artifactId>chalk-logger</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thefirstlineofcode.sand.client</groupId>
+			<artifactId>sand-client-edge</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thefirstlineofcode.sand.client</groupId>
+			<artifactId>sand-client-lora-gateway</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thefirstlineofcode.sand.client.pi</groupId>
+			<artifactId>sand-client-pi-ashining</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.thefirstlineofcode.lithosphere.tutorials.hellolora</groupId>
+			<artifactId>hello-lora-protocol</artifactId>
+			<version>0.0.1-RELEASE</version>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>libs/</classpathPrefix>
+							<mainClass>com.thefirstlineofcode.lithosphere.tutorials.hellolora.gateway.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.0.0</version>
+				<configuration>
+					<appendAssemblyId>false</appendAssemblyId>
+					<descriptors>
+						<descriptor>src/assembly/descriptor.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>com.thefirstlineofcode.releases</id>
+			<name>TheFirstLineOfCode Repository - Releases</name>
+			<url>http://120.25.166.188:9090/repository/maven-releases/</url>
+		</repository>
+	</repositories>
+</project>
+```
+>**代码说明**
+>* POM继承com.thefirstlineofcode.sand:sand-client，以便复用父POM里的依赖配置管理。
+><br><br>
+>* hello-lora-gateway是一个独立运行的Java程序。我们使用maven-assembly-plugin和maven-jar-plugin来打包和配置可这个可运行程序。
+><br><br>
+>* 依赖com.thefirstlineofcode.sand.client:sand-client-edge库，我们使用Edge库来帮助网关设备进行设备注册和连接服务器。<br>
+>>>```
+>>><dependency>
+>>>	<groupId>com.thefirstlineofcode.sand.client</groupId>
+>>>	<artifactId>sand-client-edge</artifactId>
+>>></dependency>
+>>>```
+><br><br>
+>* 依赖com.thefirstlineofcode.sand.client:sand-client-lora-gateway库，我们需要使用Lora Gateway插件。<br>
+>>>```
+>>><dependency>
+>>>	<groupId>com.thefirstlineofcode.sand.client</groupId>
+>>>	<artifactId>sand-client-lora-gateway</artifactId>
+>>></dependency>
+>>>```
+><br><br>
+>* 我们使用型号为AS32-TTL-100的LoRa模块。Sand项目提供了在树莓派硬件板上对这个型号LoRa模块的硬件通讯器封装，具体实现在com.thefirstlineofcode.sand.client.pi:sand-client-pi-ashining库中。这个库间接引用了Pi4J库，所以我们不需要再另行配置Pi4J库依赖。
+>>>```
+>>><dependency>
+>>>	<groupId>com.thefirstlineofcode.sand.client.pi</groupId>
+>>>	<artifactId>sand-client-pi-ashining</artifactId>
+>>></dependency>
+>>>```
+>* 依赖hello-lora-protocol协议包。
+>>>```
+>>><dependency>
+>>>	<groupId>com.thefirstlineofcode.lithosphere.tutorials.hellolora</groupId>
+>>>	<artifactId>hello-lora-protocol</artifactId>
+>>>	<version>0.0.1-RELEASE</version>
+>>></dependency>
+>>>```
+
+<br><br>
+### 6.1 实现HelloLoraGateway
+```
+public class HelloLoraGateway extends AbstractEdgeThing {
+	public static final String THING_MODEL = HlgModelDescriptor.MODEL_NAME;
+	public static final String SOFTWARE_VERSION = "1.0.0-BETA3";
+	
+	private static final String ATTRIBUTE_NAME_COMMUNICATOR_HAS_CONFIGURED = "communicator_has_configured";
+	
+	private ICommunicator<LoraAddress, LoraAddress, byte[]> communicator;
+	private ILoraGateway loraGateway;
+	
+	public HelloLoraGateway() {
+		super(THING_MODEL, null, true);
+		
+		communicator = createLoraCommunicator();
+	}
+
+	@Override
+	public String getSoftwareVersion() {
+		return SOFTWARE_VERSION;
+	}
+
+	@Override
+	protected boolean doProcessAttributes(Map<String, String> attributes) {
+		return initializeAndConfigureCommunicator(attributes);
+	}
+	
+	private boolean initializeAndConfigureCommunicator(Map<String, String> attributes) {
+		if (!communicator.isInitialized())
+			communicator.initialize();
+		
+		if (!"true".equals(attributes.get(ATTRIBUTE_NAME_COMMUNICATOR_HAS_CONFIGURED))) {
+			communicator.configure();
+			
+			attributes.put(ATTRIBUTE_NAME_COMMUNICATOR_HAS_CONFIGURED, "true");
+			return true;
+		}
+		
+		return false;
+	}
+
+	@Override
+	protected void registerIotPlugins() {
+		chatClient.register(LoraGatewayPlugin.class);
+	}
+
+	@Override
+	protected void startIotComponents() {
+		if (loraGateway == null) {
+			loraGateway = chatClient.createApi(ILoraGateway.class);
+			
+			loraGateway.setDownlinkCommunicator(communicator);
+			loraGateway.setUplinkCommunicators(Collections.singletonList(communicator));
+			
+			configureConcentrator(loraGateway);
+		}	
+		
+		loraGateway.start();
+	}
+	
+	private void configureConcentrator(ILoraGateway gateway) {
+		IConcentrator concentrator = gateway.getConcentrator();
+		
+		concentrator.registerLanThingModel(new HltModelDescriptor());
+		regiserExecutors(concentrator, gateway);
+	}
+
+	private ICommunicator<LoraAddress, LoraAddress, byte[]> createLoraCommunicator() {
+		As32Ttl100LoraCommunicator communicator = new As32Ttl100LoraCommunicator();
+		communicator.setMd0Pin(2);
+		communicator.setMd1Pin(3);
+		communicator.setAuxPin(4);
+		
+		return communicator;
+	}
+
+	private void regiserExecutors(IActuator actuator, final ILoraGateway loraGateway) {
+		actuator.registerExecutor(ChangeWorkingMode.class, ChangeWorkingModeExecutor.class, loraGateway);
+	}
+
+	@Override
+	protected void stopIotComponents() {
+		loraGateway.stop();
+	}
+
+	@Override
+	protected String loadThingId() {
+		return THING_MODEL + "-" + ThingsUtils.generateRandomId(8);
+	}
+
+	@Override
+	protected String loadRegistrationCode() {
+		return "abcdefghijkl";
+	}
+}
+```
+>**代码说明**
+>* 继承AbstractEdgeThing。我们使用sand-client-edge库来简化LoRa网关程序的编写。
+><br><br>
+>* As32Ttl100LoraCommunicator类将树莓派板上型号为AS32-TTL-100的LoRa Module，封装成了标准的ICommunicator接口实现。我们创建这个As32Ttl100LoraCommunicator实例，并根据我们实际的接线，设置树莓派连接到MD0，MD1，AUX的对应GPIO引脚。
+>>>```
+>>>private ICommunicator<LoraAddress, LoraAddress, byte[]> createLoraCommunicator() {
+>>>		As32Ttl100LoraCommunicator communicator = new As32Ttl100LoraCommunicator();
+>>>		communicator.setMd0Pin(2);
+>>>		communicator.setMd1Pin(3);
+>>>		communicator.setAuxPin(4);
+>>>		
+>>>		return communicator;
+>>>}
+>>>```
+><br><br>
+>* AbstractEdgeThing使用一个名为${THING_MODE_NAME}-attributes.propertis的属性配置文件来保存属性参数。并且，留下了一个doProcessAttributes()方法允许子类使用这个属性文件。我们在HelloLoraGateway中重载了这个方法，借用属性配置文件来保存我们用到的通讯器已配置（communicator_has_configured）参数。
+>>>```
+>>>protected boolean doProcessAttributes(Map<String, String> attributes) {
+>>>		return initializeAndConfigureCommunicator(attributes);
+>>>}
+>>>
+>>>private boolean initializeAndConfigureCommunicator(Map<String, String> attributes) {
+>>>	if (!communicator.isInitialized())
+>>>		communicator.initialize();
+>>>
+>>>	if (!"true".equals(attributes.get(ATTRIBUTE_NAME_COMMUNICATOR_HAS_CONFIGURED))) {
+>>>		communicator.configure();
+>>>		attributes.put(ATTRIBUTE_NAME_COMMUNICATOR_HAS_CONFIGURED, "true");
+>>>		return true;
+>>>	}
+>>>
+>>>	return false;
+>>>}
+>>>```
+>>>我们使用Communicator之前，需要对它做initialize和configure。<br><br>
+>>>communicator.initialize()方法，每次程序启动，都需要用它初始化Communicator。<br><br>
+>>>communicator.configure()方法，则只需要调用一次。<br><br>
+>>>这里的的逻辑是，LoRa模块提供了持久化保存配置的功能。所以，调用过一次communicator.configure()后，相关配置信息就被LoRa模块的硬件持久化保存记住了。即使所有硬件掉电重启，重启后，LoRa模块依然可以读取到已经持久化保存的配置信息。所以configure()只需要调用一次，之后不再需要反复调用。<br><br>
+我们在第一次做configure时，这时候属性配置文件中，还不能读到名为communicator_has_configured的属性参数。我们调用configure()，调用结束后，设置communicator_has_configured属性参数值为"true"。<br><br>
+然后，我们返回true，这个返回值表示我们修改了属性配置，需要将最新的属性列表保存到属性配置文件。<br><br>
+下次再进入initializeAndConfigureCommunicator()方法，我们能读取到communicator_has_configured的属性值为"true"。我们直接退出，不再反复调用configure()。
+><br><br>
+>* 在HelloLoraGateway中，我们只需要使用LoRaGateway插件。
+>>>```
+>>>protected void registerIotPlugins() {
+>>>		chatClient.register(LoraGatewayPlugin.class);
+>>>}
+>>>```
+><br><br>
+>* 
+
+<br><br>
+## 7 连接LoRa终端设备硬件
+
+<br><br>
+## 8 开发LoRa终端程序
+
+<br><br>
+## 9 连通测试所有
+
+<br><br>
+## 10 总结
+
