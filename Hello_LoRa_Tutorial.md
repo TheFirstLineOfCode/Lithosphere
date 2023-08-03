@@ -345,7 +345,7 @@ cp hello-lora-server/target/hello-lora-server-0.0.1-RELEASE.jar granite-lite-iot
 我们来看看LoRa网关用到的LoRa模块长啥样。<br><br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/as32_ttl_100.jpg)
 <br><br>
-这个LoRa模块型号AS32-TTL-100，在淘宝上买，零售价还挺贵的，30块钱一个。
+这个LoRa模块型号AS32-TTL-100，在淘宝上买，零售价还挺贵的，30块钱一个。头上黑黑的、粗粗的东西，是信号天线，5块钱一个。
 <br><br>
 我们可以看到，它有7个引脚：
 | 引脚名        | 作用 |
@@ -564,7 +564,7 @@ sudo vi /boot/cmdline.txt
 >>>```
 
 <br><br>
-### 6.1 实现HelloLoraGateway
+### 6.2 实现HelloLoraGateway
 ```
 public class HelloLoraGateway extends AbstractEdgeThing {
 	public static final String THING_MODEL = HlgModelDescriptor.MODEL_NAME;
@@ -700,7 +700,7 @@ public class HelloLoraGateway extends AbstractEdgeThing {
 >>>这里的的逻辑是，LoRa模块提供了持久化保存配置的功能。所以，调用过一次communicator.configure()后，相关配置信息就被LoRa模块的硬件持久化保存记住了。即使所有硬件掉电重启，重启后，LoRa模块依然可以读取到已经持久化保存的配置信息。所以configure()只需要调用一次，之后不再需要反复调用。<br><br>
 我们在第一次做configure时，这时候属性配置文件中，还不能读到名为communicator_has_configured的属性参数。我们调用configure()，调用结束后，设置communicator_has_configured属性参数值为"true"。<br><br>
 然后，我们返回true，这个返回值表示我们修改了属性配置，需要将最新的属性列表保存到属性配置文件。<br><br>
-下次再进入initializeAndConfigureCommunicator()方法，我们能读取到communicator_has_configured的属性值为"true"。我们直接退出，不再反复调用configure()。
+下次再进入initializeAndConfigureCommunicator()方法，我们能读取到communicator_has_configured的属性值为"true"。我们直接退出，不再重复调用configure()。
 ><br><br>
 >* 在HelloLoraGateway中，我们只需要使用LoRaGateway插件。
 >>>```
@@ -709,10 +709,117 @@ public class HelloLoraGateway extends AbstractEdgeThing {
 >>>}
 >>>```
 ><br><br>
->* 
+>* 在startIotComponents方法中，我们创建LoRa Gateway组件，然后对它进行配置。我们需要为LoRa Gateway设置Downlink Communicator和Uplink Communicators。其中，被设置的Uplink Communicators参数是一个ICommunicator的列表。在多频道的网关中，我们会指定多个Uplink Communicators，来提升LoRa网关的上行通讯容量。在本教程的案例中，我们只使用一块LoRa通讯芯片，这是一个单频道LoRa网关。所以我们使用Collections.singletonList(communicator)创建一个单元素的列表，然后设置到LoRa Gateway组件。
+>>>```
+>>>loraGateway.setDownlinkCommunicator(communicator);
+>>>loraGateway.setUplinkCommunicators(Collections.singletonList(communicator));
+>>>```
+><br><br>
+>* 我们为网关配置ChangeWorkingMode执行器，这样它才能被遥控切换Working Mode。<br><br>
+注意一个细节，我们不需要自己来编写ChangeWorkingModeExecutor。LoRa Gateway插件中，已经内置提供了ChangeWorkingModeExecutor，我们直接使用它。<br><br>
+这里需要注意的另一个细节是：Conconcenator组件实现了IActuator接口，我们可以用它来注册Executors。
+>>>```
+>>>... ...
+>>>IConcentrator concentrator = gateway.getConcentrator();
+>>>... ...
+>>>regiserExecutors(concentrator, gateway);
+>>>... ...
+>>>private void regiserExecutors(IActuator actuator, final ILoraGateway loraGateway) {
+>>>	actuator.registerExecutor(ChangeWorkingMode.class, ChangeWorkingModeExecutor.class, loraGateway);
+>>>}
+>>>```
+>* 我们需要登记HltModeDescriptor到网关。我们在前面的教程里，提到过需要将Mode Descriptor登记到服务器。Granite服务器完全基于插件架构，当我们通过开发插件来提供新的IoT设备功能，这时需要登记设备相关信息到服务器，服务器才能知道如何处理新IoT设备的相关功能。<br><br>
+我们在网关端使用Chalk库开发网关设备。同样的，Chalk也完全基于插件架构。所以，我们需要将终端设备的Model Descriptor注册到网关中，网关才能知道如何处理设备的相关通讯功能。我们使用IConcentrator的registerLanThingModel()API来做这个事。我们从LoRa Gateway中拿到Concentrator组件，并登记HLT（Hello LoRa Thing）设备到Concentrator。
+>>>```
+>>>IConcentrator concentrator = gateway.getConcentrator();
+>>>concentrator.registerLanThingModel(new HltModelDescriptor());
+>>>```
+
+<br><br>
+### 6.3 入口主程序
+编写一个简单的Main程序来启动运行LoRa网关。
+```
+... ...
+public static void main(String[] args) {
+	new Main().run(args);
+}
+
+private void run(String[] args) {
+... ...
+	LogConfigurator.configure(HlgModelDescriptor.MODEL_NAME, getLogLevel(logLevel));
+... ...
+	gateway.start();
+... ...
+}
+```
+>**代码说明**
+>* 我们使用chalk-logger库来配置logger。因为Hello, LoRa教程的例子相较其它几篇教程，涉及到更多端和更多协议。我们配置logger方便调试和跟踪。
+>>>```
+>>>LogConfigurator.configure(HlgModelDescriptor.MODEL_NAME, getLogLevel(logLevel));
+>>>```
+>>>LogConfigurator.configure()方法的两个参数是日志文件名，和配置的LogLevel等级。<br><br>
+以上代码将日志文件保存为${USER_HOME}/.com.thefirstlineofcode.chalk/logs/${MODE_NAME}.yyyy-MM-DD.log。
+
+<br><br>
+### 6.3 测试和注册LoRa网关
+我们来测试一下网关程序，启动LoRa网关主程序，将网关设备注册到服务器。<br><br>
+将树莓派接通电源启动起来，然后将编译好的LoRa网关程序，用scp拷贝到树莓派上。
+```
+cd hello-lora-gateway
+mvn clean package
+scp target/hello-lora-gateway-0.0.1-RELEASE.tar.gz pi@192.168.1.180:/home/pi
+```
+**注：**
+* 192.168.1.180是树莓派板的网络地址。请改为你配置树莓派板时，指定的静态IP地址。
+* pi为树莓派用户。请改为你配置树莓派时，初始化创建的用户名。
+
+<br><br>
+启动网关程序，检查它是否能够正确注册到服务器。
+```
+ssh pi@192.168.1.180
+tar -xzvf hello-lora-gateway-0.0.1-RELEASE.tar.gz
+cd hello-lora-gateway-0.0.1-RELEASE
+sudo java -jar hello-lora-gateway-0.0.1-RELEASE.jar --host=192.168.1.80
+```
+**注：**
+* 在启动网关程序之前，先启动Granite XMPP Lite IoT Server。
+* 这里，我们需要使用sudo来启动网关程序。这是由于Pi4J库的使用限制。官方文档的说法：Need to run as sudo。下图来自Pi4J官方文档。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/must_run_as_sudo.png)
+
+<br><br>
+如果能够看到Thing thing has started，说明网关程序已经成功注册，并连接到服务器。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/lora_gateway_has_started.png)
+
+### 6.4 用App控制网关切换工作模式
+我们还是用sand-demo App来遥控LoRa网关。
+<br><br>
+点击这里下载构建好的[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA3/sand-demo.apk)。
+<br><br>
+使用sand-demo用户登录到sand-demo App里后，我们可以看到型号为HLG的一个设备，它是前面注册成功的LoRa网关设备。<br><br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/change_lora_gateway_working_mode.jpg)
+<br><br>
+可以看到它有唯一一个控制菜单项，Change Working Mode。<br><br>
+点击菜单改变LoRa网关工作模式，在LoRa网关程序的控制台里，我们可以看到切换网关Working Mode的日志输出。<br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/change_lora_gateway_working_mode_to_dac.png)
 
 <br><br>
 ## 7 连接LoRa终端设备硬件
+让我们来实现最后一块拼图 - 终端设备。<br><br>
+先把硬件组装起来。终端硬件板上要接上LoRa模块和LoRa网关通讯，它还需要接上LED用于执行亮灯、熄灯、闪灯指令<br><br>
+我们使用一块Arduino Micro的硬件板子。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/arduino_micro.jpg)
+<br><br>
+这个硬件板有点贵的，在淘宝上，带USB接口线的版本，零售价47元。<br><br>
+为何我们不使用更便宜的板子？<br><br>
+这个教程里的终端程序，在Arduino Uno R3的板子上测试可以正常运行。Arduino Uno R3板在淘宝上的价格，15元。<br><br>
+问题在于，Arduino Uno R3板，不能在Arduino IDE中使用串口监视器打印调试信息。这是因为这个板子的USB接口线使用了UART串口。那么，因为我们使用的LoRa模块也要使用UART串口，这会产生冲突，除非我们愿意放弃在IDE中打印调试信息，<br><br>
+Arduino Nano板，也和Arduino Uno R3板有同样的问题。似乎Arduino的10元板，都有这个问题，在外接设备使用UART串口时，无法同时使用Arduino IDE的的串口监视器来打印调试信息。<br><br>
+好吧，为了方便打印调试信息，强烈建议使用Arduino Micro来开发本教程中的终端设备案例。<br><br>
+来接线吧，让我们来看看如何将LoRa模块和LED灯接到Arduino Micro板上。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/connect_lora_module_and_led_to_arduino_micro.png)
+<br><br>
+接好之后，看上去是这样的。
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/all_modules_connected_to_arduino_micro.jpg)
 
 <br><br>
 ## 8 开发LoRa终端程序
