@@ -823,6 +823,17 @@ Arduino Nano板，也和Arduino Uno R3板有同样的问题。似乎Arduino的10
 
 <br><br>
 ## 8 开发LoRa终端程序
+让我们开始来写终端程序吧。
+
+<br><br>
+### 8.1 安装Arduino IDE
+我们使用Arduino IDE来编写和安装hello_lora_thing硬件板程序。<br><br>
+如果你的开发机器上，并没有安装Arduino IDE，请从官方网站[下载Arduino IDE 2安装](https://docs.arduino.cc/software/ide-v2)。<br><br>
+如果你以往并没有使用Arduino IDE的相关经验，请阅读官方文档[Getting Started with Arduino IDE 2](https://docs.arduino.cc/software/ide-v2/tutorials/getting-started-ide-v2)，稍微熟悉一下这个开发工具。
+
+### 8.2 安装mud和设备适配库
+### 8.3 安装ArduinoUniqueID库
+### 8.4 编写hello_lora_thing代码
 
 <br><br>
 ## 9 连通测试所有
