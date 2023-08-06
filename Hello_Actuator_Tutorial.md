@@ -601,7 +601,7 @@ $exit
 >>>	<version>1.3</version>
 >>></dependency>
 >>>```
->>>**注意**：我们使用1.3版本Pi4J。因为Pi4J v1.4和Pi4J v2.x需要JDK 11。而我们在树莓派Zero W上，只安装了JDK 8。所以，我们使用Pi4J v1.3。
+>>>**注：**我们使用1.3版本Pi4J。因为Pi4J v1.4和Pi4J v2.x需要JDK 11。而我们在树莓派Zero W上，只安装了JDK 8。所以，我们使用Pi4J v1.3。
 >* 依赖hello-actautor-protocol协议包。
 >>>```
 >>><dependency>
@@ -624,7 +624,7 @@ public interface ISimpleLight {
 	void flash(int repeat) throws ExecutionException;
 }
 ```
-**注意：**
+**注：**
 这种控制硬件的接口，在概念里，我们把它叫做Thing Controller，智能物件控制器。
 <br><br>
 hello-actuator-thing的核心类HelloActuatorThing，我们让它实现ISimpleLight接口。
@@ -830,7 +830,7 @@ public class HelloActuatorThing extends AbstractEdgeThing implements ISimpleLigh
 ><br><br>
 >* 在registerExecutors()方法里，我们给TurnOn，TurnOff，Flash指令，注册它们对应的执行器。<br><br>
 有两种注册执行器的API。第一种API，我们直接将Action指令类，和Executor指令类，登记到Actuator。<br><br>
-**注意：**
+**注：**
 这里registerExecutor()方法的最后一个参数，是Thing Controller。<br><br>
 依据设计原则中的责任原则，Thing Controller负责直接控制IoT设备的硬件接口。在这里，Thing Controller是ISimpleLigh。<br><br>
 HelloActuatorThing实现了这个接口（ISimpleLight），提供控制硬件的turnOn()，TurnOff()，flash()方法。<br><br>
@@ -931,7 +931,7 @@ mvn clean package
 ```
 scp target/hello-actuator-thing-0.0.1-RELEASE.tar.gz pi@192.168.1.180:/home/pi
 ```
-**注意：**
+**注：**
 请将pi用户名，和树莓派网络ip 192.168.1.180，改为你自己环境的配置值。
 
 <br><br>

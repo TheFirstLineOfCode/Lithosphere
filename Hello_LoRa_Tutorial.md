@@ -37,7 +37,7 @@
 UART是Universal Asynchronous Receiver/Transmitter。<br><br>
 中文名通用异步收发器协议。<br><br>
 UART是一种硬件串口通讯协议，常被用于连接嵌入式硬件板和外部模块之间的通讯。<br><br>
-当使用UART在两个设备之间进行通讯时，须将设备1的TX接到设备2的RX，将设备1的RX接到设备2的TX。如下图：
+当使用UART在两个设备之间进行通讯时，须将设备1的TX接到设备2的RX，将设备1的RX接到设备2的TX。如下图。<br><br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/uart_two_way_communication.png)
 
 <br><br>
@@ -783,11 +783,11 @@ sudo java -jar hello-lora-gateway-0.0.1-RELEASE.jar --host=192.168.1.80
 ```
 **注：**
 * 在启动网关程序之前，先启动Granite XMPP Lite IoT Server。
-* 这里，我们需要使用sudo来启动网关程序。这是由于Pi4J库的使用限制。官方文档的说法：Need to run as sudo。下图来自Pi4J官方文档。
+* 这里，我们需要使用sudo来启动网关程序。这是由于Pi4J库的使用限制。官方文档的说法：Need to run as sudo。下图来自Pi4J官方文档。<br><br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/must_run_as_sudo.png)
 
 <br><br>
-如果能够看到Thing thing has started，说明网关程序已经成功注册，并连接到服务器。
+如果能够看到Thing thing has started，说明网关程序已经成功注册，并连接到服务器。<br><br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/lora_gateway_has_started.png)
 
 ### 6.4 用App控制网关切换工作模式
@@ -799,14 +799,14 @@ sudo java -jar hello-lora-gateway-0.0.1-RELEASE.jar --host=192.168.1.80
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/change_lora_gateway_working_mode.jpg)
 <br><br>
 可以看到它有唯一一个控制菜单项，Change Working Mode。<br><br>
-点击菜单改变LoRa网关工作模式，在LoRa网关程序的控制台里，我们可以看到切换网关Working Mode的日志输出。<br>
+点击菜单改变LoRa网关工作模式，在LoRa网关程序的控制台里，我们可以看到切换网关Working Mode的日志输出。<br><br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/change_lora_gateway_working_mode_to_dac.png)
 
 <br><br>
 ## 7 连接LoRa终端设备硬件
 让我们来实现最后一块拼图 - 终端设备。<br><br>
 先把硬件组装起来。终端硬件板上要接上LoRa模块和LoRa网关通讯，它还需要接上LED用于执行亮灯、熄灯、闪灯指令<br><br>
-我们使用一块Arduino Micro的硬件板子。
+我们使用一块Arduino Micro的硬件板子。<br><br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/arduino_micro.jpg)
 <br><br>
 这个硬件板有点贵的，在淘宝上，带USB接口线的版本，零售价47元。<br><br>
@@ -815,10 +815,10 @@ sudo java -jar hello-lora-gateway-0.0.1-RELEASE.jar --host=192.168.1.80
 问题在于，Arduino Uno R3板，不能在Arduino IDE中使用串口监视器打印调试信息。这是因为这个板子的USB接口线使用了UART串口。那么，因为我们使用的LoRa模块也要使用UART串口，这会产生冲突，除非我们愿意放弃在IDE中打印调试信息，<br><br>
 Arduino Nano板，也和Arduino Uno R3板有同样的问题。似乎Arduino的10元板，都有这个问题，在外接设备使用UART串口时，无法同时使用Arduino IDE的的串口监视器来打印调试信息。<br><br>
 好吧，为了方便打印调试信息，强烈建议使用Arduino Micro来开发本教程中的终端设备案例。<br><br>
-来接线吧，让我们来看看如何将LoRa模块和LED灯接到Arduino Micro板上。
+来接线吧，让我们来看看如何将LoRa模块和LED灯接到Arduino Micro板上。<br><br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/connect_lora_module_and_led_to_arduino_micro.png)
 <br><br>
-接好之后，看上去是这样的。
+接好之后，看上去是这样的。<br><br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/all_modules_connected_to_arduino_micro.jpg)
 
 <br><br>
@@ -832,12 +832,276 @@ Arduino Nano板，也和Arduino Uno R3板有同样的问题。似乎Arduino的10
 如果你以往并没有使用Arduino IDE的相关经验，请阅读官方文档[Getting Started with Arduino IDE 2](https://docs.arduino.cc/software/ide-v2/tutorials/getting-started-ide-v2)，稍微熟悉一下这个开发工具。
 
 ### 8.2 安装mud和设备适配库
+在开发终端程序之前，我们先安装要使用到的用到的依赖库。<br><br>
+终端程序依赖以下第三方库：
+* mud<br>
+Lithosphere平台Mud通讯库。<br><br>
+点击这里下载[Mud通讯库]()
+
+* mud_arduino_avr<br>
+Arduino AVR硬件板的Mud适配库。<br><br>
+点击这里下载[Arduino AVR硬件板的Mud适配库]()
+
+* mud_as32_ttl_100<br>
+AS32-TTL-100型号LoRa模块的Mud适配库。<br><br>
+点击这里下载[AS32-TTL-100型号LoRa模块的Mud适配库]()
+
+* arduino_unique_id_generator<br>
+Arduino硬件板唯一ID生成器。<br><br>
+点击这里下载[Arduino硬件板唯一ID生成器]()
+
+如果你不知道如何导入一个zip格式Library，那么可以阅读官方文档[Import a .zip Library](https://docs.arduino.cc/software/ide-v1/tutorials/installing-libraries#importing-a-zip-library)
+
 ### 8.3 安装ArduinoUniqueID库
-### 8.4 编写hello_lora_thing代码
+Mud提供的arduino_unique_id_generator库，依赖ArduinoUniqueID库提供的Arduino硬件板唯一ID读取功能。<br><br>
+ArduinoUniqueID库可以直接从Arduino IDE的Library Manager里安装。<br><br>
+打开Library Manager，输入ArduinoUniqueID关键字查询，找到ArduinoUniqueID库后，安装它。<br><br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/install_arduino_unique_id_library.png)
 
 <br><br>
-## 9 连通测试所有
+### 8.4 编写hello-lora-thing代码
+创建hello-lora-thing目录，然后在这个目录下，创建hello-lora-thing.ino文件，代码如下。
+```
+#include <Arduino_BuiltIn.h>
+
+#include <thing.h>
+#include <mcu_board_adaptation.h>
+#include <radio_module_adaptation.h>
+#include <arduino_unique_id_generator.h>
+
+#define MODEL_NAME "HLT"
+#define LED_PIN 12
+
+void setup() {
+  configureMcuBoard(MODEL_NAME);
+  configureRadioModule();
+  
+  registerThingIdLoader(loadThingId);
+  registerRegistrationCodeLoader(loadRegistrationCode);
+
+  registerThingProtocolsConfigurer(configureThingProtocolsImpl);
+  
+  pinMode(LED_PIN, OUTPUT);
+  
+  toBeAThing();
+}
+
+char *loadThingId() {
+  return generateThingIdUsingUniqueIdLibrary(MODEL_NAME);
+}
+
+char *loadRegistrationCode() {
+  return "abcdefghijkl";
+}
+
+void turnLedOn() {
+  digitalWrite(LED_PIN, HIGH);
+}
+
+void turnLedOff() {
+  digitalWrite(LED_PIN, LOW);
+}
+
+void flashLed() {
+  digitalWrite(LED_PIN, HIGH);
+  delay(200);
+  digitalWrite(LED_PIN, LOW);
+}
+
+int8_t processFlash(Protocol *protocol) {
+  int repeat;
+  if (!getIntAttributeValue(protocol, 0x01, &repeat)) {
+    repeat = 1;
+  }
+
+  if (repeat <= 0 || repeat > 8)
+    return -1;
+
+  for (int i = 0; i < repeat; i++) {
+    flashLed();
+    delay(500);
+  }
+
+  return 0;
+}
+
+int8_t processTurnOn(Protocol *protocol) {
+  turnLedOn();
+  return 0;
+}
+
+int8_t processTurnOff(Protocol *protocol) {
+  turnLedOff();
+  return 0;
+}
+
+void configureThingProtocolsImpl() {
+  ProtocolName pnFlash = {0xf7, 0x01, 0x00};
+  registerActionProtocol(pnFlash, processFlash, false);
+
+  ProtocolName pnTurnOn = {0xf7, 0x01, 0x02};
+  registerActionProtocol(pnTurnOn, processTurnOn, false);
+
+  ProtocolName pnTurnOff = {0xf7, 0x01, 0x03};
+  registerActionProtocol(pnTurnOff, processTurnOff, false);
+}
+
+void loop() {
+  int result = doWorksAThingShouldDo();
+  if (result != 0) {
+#ifdef ENABLE_DEBUG
+    Serial.print(F("Error occurred when the thing does the works it should do. Error number: "));
+    Serial.print(result);
+    Serial.println(F("."));    
+#endif*
+  }
+}
+```
+> **代码说明**
+>* 引入mud通讯库、Arduino AVR板mud适配库、AS32-TTL-100 LoRa模块适配库、Arduino硬件板唯一ID生成器库。
+>>>```
+>>>#include <thing.h>
+>>>#include <mcu_board_adaptation.h>
+>>>#include <radio_module_adaptation.h>
+>>>#include <arduino_unique_id_generator.h>
+>>>```
+><br><br>
+>* 定义常量MODEL_NAME和LED_PIN。LED控制引针在教程中，被连在了GPIO12引针上。如果你接LED的控制的引针不是GPIO12，那请根据自己的接线修改LED_PIN的值。
+>>>```
+>>>#define MODEL_NAME "HLT"
+>>>#define LED_PIN 12
+>>>```
+><br><br>
+>* 使用mud适配库，配置Arduino AVR硬件板和LoRa模块。
+>>>```
+>>>configureMcuBoard(MODEL_NAME);
+>>>configureRadioModule();
+>>>```
+>* 设备注册时，需要提供Thing ID和Registration Code值。我们注册loadThingId和loadRegistrationCode两个函数指针，使用它们来获取Thing ID和Registration Code值。
+>>>```
+>>>registerThingIdLoader(loadThingId);
+>>>registerRegistrationCodeLoader(loadRegistrationCode);
+>>>... ...
+>>>char *loadThingId() {
+>>>  return generateThingIdUsingUniqueIdLibrary(MODEL_NAME);
+>>>}
+>>>
+>>>char *loadRegistrationCode() {
+>>>  return "abcdefghijkl";
+>>>}
+>>>```
+>>>**注：**
+>>>* arduino_unique_id_generator库的API函数generateThingIdUsingUniqueIdLibrary()读取Arduino硬件板的唯一ID，组合MODEL_NAME来生成一个Thing ID。
+>>>* loadRegistrationCode()直接返回硬编码"abcdefghijkl"字符串。还记得我们在服务器端会检查这个硬编码的Registration Code吗？
+><br><br>
+>* 我们在configureThingProtocolsImpl()里配置Action处理函数，我们需要将configureThingProtocolsImpl()函数注册为协议配置器。
+>>>```
+>>>registerThingProtocolsConfigurer(configureThingProtocolsImpl);
+>>>... ...
+>>>void configureThingProtocolsImpl() {
+>>>  ProtocolName pnFlash = {0xf7, 0x01, 0x00};
+>>>  registerActionProtocol(pnFlash, processFlash, false);
+>>>
+>>>  ProtocolName pnTurnOn = {0xf7, 0x01, 0x02};
+>>>  registerActionProtocol(pnTurnOn, processTurnOn, false);
+>>>
+>>>  ProtocolName pnTurnOff = {0xf7, 0x01, 0x03};
+>>>  registerActionProtocol(pnTurnOff, processTurnOff, false);
+>>>}
+>>>```
+>>>**注：**
+我们在协议配置器里，登记三个Action协议Flash、TurnOn，TurnOff对应的处理函数。
+><br><br>
+>* 还是遵循责任分离原则，我们来看看怎么做硬件控制。使用Arduino的API设置LED_PIN的PIN Mode。然后，我们在turnOn()，turnOff()，flashLED()函数里，通过LED_PIN引针控制LED灯。
+>>>```
+>>>... ...
+>>>pinMode(LED_PIN, OUTPUT);
+>>>... ...
+>>>void turnLedOn() {
+>>>	digitalWrite(LED_PIN, HIGH);
+>>>}
+>>>
+>>>void turnLedOff() {
+>>>	digitalWrite(LED_PIN, LOW);
+>>>}
+>>>
+>>>void flashLed() {
+>>>	digitalWrite(LED_PIN, HIGH);
+>>>	delay(200);
+>>>	digitalWrite(LED_PIN, LOW);
+>>>}
+>>>```
+>>>**注：**
+>>>pinMode()、delay()、digitalWrite()都是Arduino的开发API。Arduino开发比较简单，在本教程中不再赘述，请自行学习。<br><br>
+>>>关于Arduino的开发，可以参考Arduino官方文档[Arduino程序语言参考](https://www.arduino.cc/reference/en/)。
+><br><br>
+>* 现在来处理IoT通讯逻辑，我们使用mud库来简化IoT的通讯。
+>>>```
+>>>... ...
+>>>toBeAThing();
+>>>... ...
+>>>int result = doWorksAThingShouldDo();
+>>>... ...
+>>>int8_t processFlash(Protocol *protocol) {
+>>>  int repeat;
+>>>  if (!getIntAttributeValue(protocol, 0x01, &repeat)) {
+>>>    repeat = 1;
+>>>  }
+>>>
+>>>  if (repeat <= 0 || repeat > 8)
+>>>    return -1;
+>>>
+>>>  for (int i = 0; i < repeat; i++) {
+>>>    flashLed();
+>>>    delay(500);
+>>>  }
+>>>
+>>>  return 0;
+>>>}
+>>>```
+>>>**注：**
+>>>* 在setup()里，调用toBeAThing()，让设备变身智能物件。在loop()里，调用doWorksAThingShouldDo()，做智能物件该做的事。魔法就在藏在这两个函数中，它们会搞定一切。<br><br>
+>>>* 我们在processFlash()里，处理收到的Flash指令。函数会收到带Protocol数据结构的参数的回调。我们调用getIntAttributeValue()来获取repeat参数。并做响应逻辑处理。trunOn()和turnOff()函数的处理更简单，不再赘述。<br><br>
+>>>* 在指令处理函数里，如果有错误，返回0之外的返回值，表示这个错误的错误码。返回0表示指令已被正常执行。
+
+### 8.5 上传程序到终端硬件板
+用Arduino IDE将程序上传到Arduino Micro硬件板。<br><br>
+如果你不知道怎么做，请参考官方文档[How to upload a sketch with the Arduino IDE 2](https://docs.arduino.cc/software/ide-v2/tutorials/getting-started/ide-v2-uploading-a-sketch)。
 
 <br><br>
-## 10 总结
+### 8.6 测试终端程序
+现在可以来测试终端设备了。
+
+<br><br>
+#### 8.6.1 前置准备
+将Granite Lite IoT XMPP Server启动起来。<br><br>
+然后，登录到树莓派硬件板，将LoRa网关程序启动起来。<br><br>
+
+<br><br>
+#### 8.6.2 注册终端设备
+登录sand-demo App程序。<br><br>
+如果还没有安装sand-demo App，请点击这里下载安装使用[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA3/sand-demo.apk)。<br><br>
+
+使用LoRa网关设备的Changing Working Mode菜单，修改网关设备的工作模式为DAC。在DAC工作模式下，终端设备才能通过网关注册到服务器。切换工作模式后，应该能够看到网关控制台有"DAC service has started."信息输出。<br><br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/lora_gateway_has_changed_its_working_mode_to_dac.png)
+
+在Arduino IDE里，打开Serial Monitor。<br><br>
+接通Arduino Micro硬件板，会看到一些终端硬件板协商地址，申请节点添加的调试信息。<br><br>
+如果能看到"I'm a thing now!"信息出现在串口监视器里，终端设备已经成功注册。<br><br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/I_am_a_thing_now.png)
+
+#### 控制终端硬件闪灯
+如果一直sand-demo App一直处于打开状态，终端设备注册成功后，会收到添加终端接到网关成功的提示信息。<br><br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/node_added.jpg)<br><br>
+点击"是的，刷新智能物件列表"按钮，刷新设备列表。现在可以看到网关设备和终端设备，都出现在App的智能物件列表中了。<br><br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/both_gateway_and_thing_have_registered.jpg)<br><br>
+
+使用LoRa网关设备的Changing Working Mode菜单，修改网关设备的工作模式为ROUTER。在ROUTER工作模式下，网关才能够转发远程控制指令。<br><br>
+现在，可以使用终端设备的控制菜单，来遥控终端设备亮灯、熄灯、闪灯了。
+
+<br><br>
+## 10 当我遇到错误时
+
+<br><br>
+## 11 总结
 
