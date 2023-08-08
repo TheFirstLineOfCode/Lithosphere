@@ -115,6 +115,44 @@ No LoRa，No JSON，No XML，No MQTT，No HTTP，... ...<br><br>
 Only TUXP。
 
 <br><br>
+### 2.6 BXMPP
+让我们来聊聊Lithosphere平台里锐利的宝剑，BXMPP！
+
+<br><br>
+#### 2.6.1 为何需要BXMPP？<br><br>
+一个最简单的回答，当然是：<br><br>
+**优化通讯效率**<br><br>
+让我们再深入一些分析这个问题。<br><br>
+开发IoT应用，就会涉及到多端、多协议问题。<br><br>
+* IoT专用通讯协议，需要二进制通讯协议。<br>
+一些IoT专用通讯协议，因为省电、低能耗的需求，被设计为低速率。<br><br>
+对于JSON，XML来说，这些低速率的通讯协议，速度太慢了！在这些IoT专用网络里，JSON，XML格式数据包太大了！<br><br>
+我们需要二进制协议来改善优化网络通讯。<br><br>
+* 终端设备环境，需要二进制通讯协议。<br>
+IoT的世界，千变万化！IoT里的T - Thing，数量多如泥沙！<br><br>
+因为部署环境、功耗、以及成本的考虑，我们常在应用中使用低成本、廉价的MCU解决方案。<br><br>
+MCU硬件板的性能、资源，往往有限。许多MCU的板子，甚至不能运行JSON、XML解析器。<br><br>
+就算使用性能更好的高端MCU板，有限的资源，也不应该消耗在JSON、XML的解析上。<br><br>
+二进制通讯协议，很明显是更好的解决方案。
+<br><br>
+在本教程中，我们使用Arduino Micro来作为终端设备硬件板，开发教程的例子。它的内存SRAM容量为2.5K。<br><br>
+本教程案例，也在Arduino UNO R3上测试通过，这是一款廉价10元板，我在淘宝上购买它的价格是15元，它的内存SRAM容量为2k。
+
+<br><br>
+#### 2.6.2 BXMPP究竟是什么？
+在IoT开发中，使用XMPP协议，可能会遭到最大的质疑是，基于XML的BXMPP，通讯效率太差了，这个协议不适合用于需要高效通讯的IoT应用。<br><br>
+解决方案是什么？其实有一个公司，已经为我们做出了最佳示范。<br><br>
+这个公司是WhatsApp。它使用叫名为FunXMPP的XMPP二进制变种协议，来支撑全球20亿IM用户的使用。<br><br>
+Lithosphre也提供了XMPP的二进制变种协议，来改善通讯效率问题。这个二进制BXMPP变种协议被命名为BXMPP。<br><br>
+
+#### 2.6.2 BXMPP通讯效率如何？
+我们直接来看使用BXMPP的实际效果。<br><br>
+在LoRa网络中，LoRa终端设备通过LoRa网关注册到服务器。<br><br>
+在这个注册过程中，LoRa终端上报Thing ID（13字节）和Registration Code（12字节）；LoRa网关给LoRa终端动态分配地址并设置数据上报通道；最后网关发消息给终端设备确认注册成功。<br><br>
+整个过程LoRa终端设备和LoRa网关总共有4次通讯，全部通讯过程，总计交换94字节数据，完成整个终端设备注册过程。<br><br>
+**所以，请放心使用Lithosphere平台开发IoT应用，不用担心通讯效率问题。**
+
+<br><br>
 ## 3 开发协议包
 我们总是先要开发协议包。<br><br>
 本教程中开发协议包过程，和[Hello, Actuator教程开发协议包](./Hello_Actuator_Tutorial.md#开发协议包)中类似。<br><br>
@@ -761,7 +799,56 @@ private void run(String[] args) {
 以上代码将日志文件保存为${USER_HOME}/.com.thefirstlineofcode.chalk/logs/${MODE_NAME}.yyyy-MM-DD.log。
 
 <br><br>
-### 6.3 测试和注册LoRa网关
+### 6.4 BXMPP
+让我们来配置使用BXMPP。<br><br>
+考虑到LoRa网络的低速率，以及Arduio低端硬件板的资源处理能力，我们需要在LoRa网络里，使用二进制的BXMPP协议。<br><br>
+#### 6.4.1 引入sand-protocols-bxmpp-extensions库
+sand项目内置的IoT通讯相关协议，都已经配置好。我们只要引入相关BXMPP协议扩展库就Ok了。<br><br>
+在项目的pom.xml文件中，我们引入com.thefirstlineofcode.sand.protocols:sand-protocols-bxmpp-extensions依赖库。
+```
+... ...
+<dependency>
+	<groupId>com.thefirstlineofcode.sand.protocols</groupId>
+	<artifactId>sand-protocols-bxmpp-extensions</artifactId>
+</dependency>
+... ...
+```
+
+#### 6.4.2 配置BXMPP应用协议扩展
+我们在hello-lora-protocol协议包中，引入了应用专用的Flash、TurnOn、TurnOff协议对象。我们需要为它们配置BXMPP协议扩展。<br><br>
+二进制XMPP的一个关键思路，就是采用替换法，将把XMPP里的长长的字符串常量，都替换成单字节的替换字节。<br><br>
+例如，Flash协议对象，当repeat属性被设置为5时，会被OXM框架翻译成以下的XMPP文档：<br>
+```
+<flash xmlns="urn:leps:things:simple-light" repeat=5/>
+```
+我们能够看到，flash、xmlns、urn:leps:things:simple-light、repeat这几个字符串都很长，而且它们都是字符串常量。<br><br>
+在通讯时，我们可以把这些字符串，都换成单字节的字节替换符，以优化通讯的效率。<br><br>
+具体怎么做呢？<br><br>
+我们在src/main/resources目录下，创建/META-INF/iot-lan-bxmpp-extensions.txt文件，在这个文件里，我们列出需要引入的BXMPP协议扩展文件。<br><br>
+在本教程案例里，我们只需要在iot-lan-bxmpp-extensions.txt文件里，引入hello-lora-protocol协议包的BXMPP协议扩展配置文件。<br><br>
+iot-lan-bxmpp-extensions.txt文件内容如下：
+```
+hello-lora-bxmpp-extension.properties
+```
+我们在src/main/resources目录下，创建hello-lora-bxmpp-extension.properties文件，在这文件里，我们配置hello-lora-protocol协议的BXMPP替换规则。
+```
+0xf70x01=urn:leps:things:simple-light
+0x00=flash
+0x01=repeat
+0x02=turn-on
+0x03=turn-off
+<br><br>
+```
+**代码说明**
+* XMPP协议使用xmlns来扩展协议，不同的xmlns，表示不同的协议。<br><br>
+在hello-lora-protocol中，flash协议的local name是flash，它的的xmlns被定义为"urn:leps:things:simple-light"。<br><br>
+所以XMPP版本的flash协议，完整的协议名为urn:leps:things:simple-light | flash<br><br>
+根据hello-lora-bxmpp-extension.properties的配置，flash协议在它的BXMPP版本中，协议名被替换成3字节替换符0xf70x010x00。<br><br>
+* 属性名repeat，被替换成了1字节替换符0x01。
+* turn-on和turn-off协议，被翻译成BXMPP协议时，规则同flash协议类似，不再赘述。
+
+<br><br>
+### 6.5 测试和注册LoRa网关
 我们来测试一下网关程序，启动LoRa网关主程序，将网关设备注册到服务器。<br><br>
 将树莓派接通电源启动起来，然后将编译好的LoRa网关程序，用scp拷贝到树莓派上。
 ```
@@ -836,19 +923,23 @@ Arduino Nano板，也和Arduino Uno R3板有同样的问题。似乎Arduino的10
 终端程序依赖以下第三方库：
 * mud<br>
 Lithosphere平台Mud通讯库。<br><br>
-点击这里下载[Mud通讯库]()
+点击这里下载[Mud通讯库](https://github.com/TheFirstLineOfCode/mud/releases/download/1.0.0-BETA2/mud.zip)
 
 * mud_arduino_avr<br>
 Arduino AVR硬件板的Mud适配库。<br><br>
-点击这里下载[Arduino AVR硬件板的Mud适配库]()
+点击这里下载[Arduino AVR硬件板的Mud适配库](https://github.com/TheFirstLineOfCode/mud/releases/download/1.0.0-BETA2/mud_arduino_avr.zip)
 
 * mud_as32_ttl_100<br>
 AS32-TTL-100型号LoRa模块的Mud适配库。<br><br>
-点击这里下载[AS32-TTL-100型号LoRa模块的Mud适配库]()
+点击这里下载[AS32-TTL-100型号LoRa模块的Mud适配库](https://github.com/TheFirstLineOfCode/mud/releases/download/1.0.0-BETA2/mud_as32_ttl_100.zip)
 
 * arduino_unique_id_generator<br>
 Arduino硬件板唯一ID生成器。<br><br>
-点击这里下载[Arduino硬件板唯一ID生成器]()
+点击这里下载[Arduino硬件板唯一ID生成器](https://github.com/TheFirstLineOfCode/mud/releases/download/1.0.0-BETA2/arduino_unique_id_generator.zip)
+
+* mud_configuration<br>
+Arduino硬件板的Mud适配配置文件<br><br>
+https://github.com/TheFirstLineOfCode/mud/releases/download/1.0.0-BETA2/mud_configuration.zip
 
 如果你不知道如何导入一个zip格式Library，那么可以阅读官方文档[Import a .zip Library](https://docs.arduino.cc/software/ide-v1/tutorials/installing-libraries#importing-a-zip-library)
 
@@ -1010,7 +1101,8 @@ void loop() {
 >>>}
 >>>```
 >>>**注：**
-我们在协议配置器里，登记三个Action协议Flash、TurnOn，TurnOff对应的处理函数。
+* 我们在协议配置器里，登记三个Action协议Flash、TurnOn，TurnOff对应的处理函数。<br><br>
+注意这里3字节的BXMPP协议名定义，它来自我们在前面定义的BXMPP协议扩展配置文件[hello-lora-bxmpp-extension.properties](#配置BXMPP应用协议扩展)。
 ><br><br>
 >* 还是遵循责任分离原则，我们来看看怎么做硬件控制。使用Arduino的API设置LED_PIN的PIN Mode。然后，我们在turnOn()，turnOff()，flashLED()函数里，通过LED_PIN引针控制LED灯。
 >>>```
@@ -1061,8 +1153,10 @@ void loop() {
 >>>```
 >>>**注：**
 >>>* 在setup()里，调用toBeAThing()，让设备变身智能物件。在loop()里，调用doWorksAThingShouldDo()，做智能物件该做的事。魔法就在藏在这两个函数中，它们会搞定一切。<br><br>
->>>* 我们在processFlash()里，处理收到的Flash指令。函数会收到带Protocol数据结构的参数的回调。我们调用getIntAttributeValue()来获取repeat参数。并做响应逻辑处理。trunOn()和turnOff()函数的处理更简单，不再赘述。<br><br>
+>>>* 我们在processFlash()里，处理收到的Flash指令。函数会收到带Protocol数据结构的参数的回调。我们调用getIntAttributeValue()来获取repeat参数。并做响应逻辑处理。<br><br>
+>>>* 我们获取repeat参数值时，使用了参数名的替换字符0x01。它来自我们在前面定义的BXMPP协议扩展配置文件[hello-lora-bxmpp-extension.properties](#配置BXMPP应用协议扩展)。<br><br>
 >>>* 在指令处理函数里，如果有错误，返回0之外的返回值，表示这个错误的错误码。返回0表示指令已被正常执行。
+>>>* trunOn()和turnOff()函数的处理更简单，不再赘述。<br><br>
 
 ### 8.5 上传程序到终端硬件板
 用Arduino IDE将程序上传到Arduino Micro硬件板。<br><br>
@@ -1101,7 +1195,50 @@ void loop() {
 
 <br><br>
 ## 10 当我遇到错误时
+一个最简单的解决方法，能不能重来一次啊？<br><br>
+可以的！
+
+<br><br>
+### 10.1 重置终端hello-lora-thing
+在setup()里调用toBeAThing()之前，先调用resetThing();<br><br>
+这会重置终端硬件板的状态为初始化状态，它会重新申请设备注册。<br><br>
+![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/arduino_ide_reset_thing.png)
+
+<br><br>
+### 10.2 重置hello-lora-gateway
+登录到树莓派网关硬件板上。删除掉Edge Thing的属性配置文件。<br><br>
+```
+ssh pi@192.168.1.180
+sudo -i
+rm -rf .com.thefirstlineofcode.sand.client.edge/HLG-attributes.properties
+exit
+```
+**注：**
+* 网关程序将状态保存在属性配置文件中，删除这个文件，会重置网关程序状态。<br><br>
+* Edge Thing的属性配置文件，被保存为${USER_HOME}/.com.thefirstlineofcode.sand.client.edge/${EDGE_THING_MODEL_NAME}-attributes.properties。 <br><br>
+* 在删除这个文件之前，先执行sudo -i切换到root身份。还记得我们因为要使用Pi4J V2版本，必须要使用sudo指令来执行网关程序吗？
+
+<br><br>
+### 10.3 重置Granite Lite IoT XMPP Server
+删除掉服务器目录下data子目录，可以重置服务器状态，如下：
+```
+cd granite-lite-iot-1.0.4-RELEASE
+rm -rf data
+```
+**注：**
+删除data目录，会重置服务器所有状态。<br><br>
+所以重置服务器后，记得要重新执行sand-demo create-test-users，重新创建测试用户。
 
 <br><br>
 ## 11 总结
-
+通过这篇教程，我们可以学习到以下的内容：
+* 使用UART串口通讯，我们可以在Linux系统中，集成使用较复杂的外部通讯模块，例如本教程中的LoRa模块。<br><br>
+* IoT专用网络协议，不兼容互联网的TCP/IP。所以，我们需要使用IoT网关来帮助IoT终端连接到互联网。<br><br>
+* 相较于传统互联网应用，IoT应用会涉及到更多端和更多协议，这给IoT应用带来了额外的复杂性。<br><br>
+为简化这个问题，Lithosphere使用TUXP协议来屏蔽其它的IoT协议。<br><br>
+* 在通讯协议层，由于我们使用TUXP和OXM技术，我们只需要定义协议对象，然后在开发API中直接使用它。我们定义的协议对象，从移动端App开始，通过服务器、IoT网关，最终直达IoT终端设备，这个过程不需要做任何协议翻译解析相关的任何工作。<br><br>
+* 使用LoRa网关插件，我们用不到100行代码，开发了一个全功能的LoRa网关程序。<br><br>
+* 在IoT终端，我们用95行代码，开发了LED灯终端控制程序。这其中大部分是硬件控制、协议配置、协议处理的相关代码。使用Mud库，给终端设备带来LoRa通讯能力所需要的代码数量，是4行代码。<br><br>
+* 在IoT专用网络里，我们使用BXMPP协议。通过简单的配置，协议包在IoT网络内被翻译成为二进制XMPP兼容协议。<br><br>
+所以，我们不需要担心通讯效率问题。
+* 树莓派和Arduino，都不复杂。传统的纯软件开发人员，完全可以通过使用这些硬件平台，进入到IoT应用领域。

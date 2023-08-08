@@ -85,7 +85,7 @@ Lithosphere IoT平台，已经内置实现了IBTR功能。基于服务器端和�
 
 <br><br>
 ## 5 配置硬件板基础软件环境
-在[2 安装和配置Raspberry Pi](#2-安装和配置raspberry-pi)步骤中，我们只是得到了一个初始化版本的RaspBerry Pi OS操作系统。要想在上面能运行Lithosphere IoT平台的终端程序，还得做以下的配置。
+在[2 安装和配置Raspberry Pi](#安装和配置raspberry-pi)步骤中，我们只是得到了一个初始化版本的RaspBerry Pi OS操作系统。要想在上面能运行Lithosphere IoT平台的终端程序，还得做以下的配置。
 
 <br><br>
 ### 5.1 安装OpenJDK
