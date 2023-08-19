@@ -143,7 +143,7 @@ MCU硬件板的性能、资源，往往有限。许多MCU的板子，甚至不�
 在IoT开发中，使用XMPP协议，可能会遭到最大的质疑是，基于XML的BXMPP，通讯效率太差了，这个协议不适合用于需要高效通讯的IoT应用。<br><br>
 解决方案是什么？其实有一个公司，已经为我们做出了最佳示范。<br><br>
 这个公司是WhatsApp。它使用叫名为FunXMPP的XMPP二进制变种协议，来支撑全球20亿IM用户的使用。<br><br>
-Lithosphre也提供了XMPP的二进制变种协议，来改善通讯效率问题。这个二进制BXMPP变种协议被命名为BXMPP。<br><br>
+Lithosphre也提供了XMPP的二进制变种协议，来改善通讯效率问题。这个二进制XMPP变种协议被命名为BXMPP。<br><br>
 
 #### 2.6.2 BXMPP通讯效率如何？
 我们直接来看使用BXMPP的实际效果。<br><br>
@@ -606,7 +606,7 @@ sudo vi /boot/cmdline.txt
 ```
 public class HelloLoraGateway extends AbstractEdgeThing {
 	public static final String THING_MODEL = HlgModelDescriptor.MODEL_NAME;
-	public static final String SOFTWARE_VERSION = "1.0.0-BETA3";
+	public static final String SOFTWARE_VERSION = "0.0.1-RELEASE";
 	
 	private static final String ATTRIBUTE_NAME_COMMUNICATOR_HAS_CONFIGURED = "communicator_has_configured";
 	
@@ -837,14 +837,13 @@ hello-lora-bxmpp-extension.properties
 0x01=repeat
 0x02=turn-on
 0x03=turn-off
-<br><br>
 ```
 **代码说明**
 * XMPP协议使用xmlns来扩展协议，不同的xmlns，表示不同的协议。<br><br>
 在hello-lora-protocol中，flash协议的local name是flash，它的的xmlns被定义为"urn:leps:things:simple-light"。<br><br>
 所以XMPP版本的flash协议，完整的协议名为urn:leps:things:simple-light | flash<br><br>
 根据hello-lora-bxmpp-extension.properties的配置，flash协议在它的BXMPP版本中，协议名被替换成3字节替换符0xf70x010x00。<br><br>
-* 属性名repeat，被替换成了1字节替换符0x01。
+* 属性名repeat，被替换成了1字节替换符0x01。<br><br>
 * turn-on和turn-off协议，被翻译成BXMPP协议时，规则同flash协议类似，不再赘述。
 
 <br><br>

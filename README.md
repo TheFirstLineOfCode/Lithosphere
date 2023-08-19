@@ -61,7 +61,7 @@ Sand项目提供一组封装良好的IoT插件。这些IoT插件基于Chalk（�
 基于WebRTC技术的实时监控摄像头组件。
 <br><br>
 ### [Mud](https://github.com/TheFirstLineOfCode/mud)<br>
-MCU板通讯库。支持BXMPP，和TACP协议族Notification
+MCU板通讯库。支持BXMPP，和TUXP协议族Notification、
 Execution、Report等协议。使用Mud库，可以为MCU板添加IoT通讯能力。
 <br><br>
 ## 快速入门
