@@ -394,15 +394,18 @@ private void run(String[] args) {
 <br><br>
 #### 6.3.1 部署WebRTC Native Service程序
 Webcam组件依赖封装了WebRTC库的WebRTC Native Service程序，它是一个C++程序。<br><br>
+关于WebRTC Native Service程序更多细节，可以参考[WebRTC Native Service项目源码](https://github.com/TheFirstLineOfCode/sand/tree/main/client/WebcamWebrtcNativeService)。<br><br>
 我们将树莓派接通电源启动起来，然后登录到树莓派，下载和部署WebRTC Native Service程序。
 ```
 ssh pi@192.168.1.180
 mkdir WebcamWebrtcNativeService
 wget -O ./WebcamWebrtcNativeService/WebcamWebrtcNativeService https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/WebcamWebrtcNativeService
+chmod a+x ./WebcamWebrtcNativeService/WebcamWebrtcNativeService
 ```
 **注：**
 * Webcam组件默认会在${USER_HOME}/WebcamWebrtcNativeService/WebcamWebrtcNativeService路径找WebRTC Native Service程序。如果修改了WebRTC Native Service程序的存放路径，需要调用Webcam组件的setWebrtcNativeServicePath()方法来设置WebRTC Native Service程序路径。
 <br><br>
+* 注意下载到的WebcamWebrtcNativeService的文件权限。如果文件缺少x执行权限，需要用chmod命令给程序加上x权限。
 #### 6.3.2 部署测试hello-webrtc-thing
 将编译好的设备端程序，用scp拷贝到树莓派上。
 ```
