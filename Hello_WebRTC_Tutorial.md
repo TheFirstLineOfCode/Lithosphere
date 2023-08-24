@@ -12,6 +12,9 @@
 **USB摄像头**<br>
 下图是这个教程中使用到的硬件。
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/hello_webcam_hardwares.jpg)
+使用到的硬件价格：
+Raspberry Pi 3A+硬件板，淘宝上购买229元。<br><br>
+USB摄像头，720P/100W像素，淘宝上买42元一个。<br><br>
 
 <br><br>
 ## 2 概念

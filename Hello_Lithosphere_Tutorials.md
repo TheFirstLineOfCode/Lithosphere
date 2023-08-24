@@ -30,9 +30,9 @@ Sensor是IoT应用里最常见的设备。<br><br>
 我们通过使用Lithosphere平台自带的Report协议，通过LoRa网关，定时上报温度数据到服务器。<br><br>
 最后，我们做一个事，我们在服务器端将温度数据推送到App端，这样，我们就可以在App上，查看实时温度了。<br><br>
 在这个范例中，我们主要是使用了Sensor插件。<br><br>
-[**Hello, WebRTC**](./Hello_XMPP_Tutorial.md)<br>
+[**Hello, WebRTC**](./Hello_WebRTC_Tutorial.md)<br>
 IoT应用中，常见的一个需求是实时视频监控。<br><br>
-在这篇教程中，我们使用一个Raspberry Pi 3B的边缘设备，给它接上一个USB摄像头。<br><br>
+在这篇教程中，我们使用一个Raspberry Pi 3A+的边缘设备，给它接上一个USB摄像头。<br><br>
 通过使用Webcam插件，我们就可以在App上随时打开这个Webcam设备，查看实时视频流了<br><br>
 [**Hello, Friends**](./Hello_Friends_Tutorial.md)<br>
 在更复杂的IoT应用中，我们需要让IoT设备之间互相进行通讯。<br><br>
