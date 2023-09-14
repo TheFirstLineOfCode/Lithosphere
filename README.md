@@ -7,8 +7,8 @@ Lithosphere 作为IoT应用的解决方案，主要有以下的特征：
 * **全栈IoT开发框架**<br> 
 Lithosphere提供全栈的IoT解决方案，包括IoT服务器，LoT局域网网关，到MCU硬件板通讯库，以及移动端开发框架。<br><br>
 Lithosphere采用统一的架构技术和通讯协议，开发者不再需要整合多种开发技术来开发IoT应用，这使得IoT应用的开发变得简单。<br><br>
-* **全插件架构**<br>
-Lithosphere的核心子项目Chalk，Granite，Sand等，都采用插件架构设计。采用Lithosphere开发的IoT应用一般会具备以下这些特征：
+* **全插件架构（Plugin-All-Architecture）**<br>
+Lithosphere的核心子项目Chalk，Granite，Sand等，都采用全插件架构设计。采用Lithosphere开发的IoT应用一般会具备以下这些特征：
   * 高度模块化
   * 扩展性良好
   * 部署灵活

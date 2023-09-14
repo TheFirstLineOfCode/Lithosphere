@@ -346,6 +346,7 @@ mvn clean install
 >* parent设置为com.thefirstlineofcode.sand:sand-server，可引用parent POM里的以来配置管理。
 ><br><br>
 >* 依赖com.thefirstlineofcode.sand.server:sand-server-things库，因为我们要使用这个库里的接口IThingProvider和IThingRegistrationCustomizer来实现相关功能。
+><br><br>
 >* 依赖hello-actuator-protocol协议包。
 
 <br><br>
