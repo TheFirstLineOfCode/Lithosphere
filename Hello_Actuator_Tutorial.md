@@ -8,7 +8,7 @@
 **Java = 8**（树莓派端）<br>
 **Java >= 11**（服务器端）<br>
 **Granite Lite IoT XMPP Server**<br>
-点击这里下载[Granite Lite IoT XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/granite-lite-iot-1.0.4-RELEASE.zip)<br>
+点击这里下载[Granite Lite IoT XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/granite-lite-iot-1.0.5-RELEASE.zip)<br>
 **Raspberry Pi Zero W硬件板**<br>
 **LED模块**<br>
 **几颗杜邦线**<br><br>
@@ -313,7 +313,7 @@ mvn clean install
 	<parent>
 		<groupId>com.thefirstlineofcode.sand</groupId>
 		<artifactId>sand-server</artifactId>
-		<version>1.0.0-BETA3</version>
+		<version>1.0.0-BETA4</version>
 	</parent>
 
 	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloactuator</groupId>
@@ -429,9 +429,9 @@ mvn clean package
 <br><br>
 将hello-actuator-server插件包和它依赖的hello-actuator-protocol包，把这两个jar包，copy到服务器的plugins目录下。
 ```
-cp hello-actuator-protocol/target/hello-actuator-protocol-0.0.1-RELEASE.jar granite-lite-iot-1.0.4-RELEASE/plugins
+cp hello-actuator-protocol/target/hello-actuator-protocol-0.0.1-RELEASE.jar granite-lite-iot-1.0.5-RELEASE/plugins
 
-cp hello-actuator-server/target/hello-actuator-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.4-RELEASE/plugins
+cp hello-actuator-server/target/hello-actuator-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.5-RELEASE/plugins
 ```
 <br><br>
 服务器端插件已经开发完成，你可以参考官方开源仓库代码[hello-actuator-server服务器端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-actuator/hello-actuator-server)
@@ -440,8 +440,8 @@ cp hello-actuator-server/target/hello-actuator-server-0.0.1-RELEASE.jar granite-
 ### 7.6 检查Granite Lite XMPP Server状态
 启动Granite Lite XMPP Server
 ```
-cd granite-lite-iot-1.0.4
-java -jar granite-server-1.0.4-RELEASE.jar -console
+cd granite-lite-iot-1.0.5
+java -jar granite-server-lite-1.0.5-RELEASE.jar -console
 ```
 带-console参数启动Granite Lite XMPP Server之后，能够看到Granite Server Console的界面。
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console.png)
@@ -449,7 +449,7 @@ java -jar granite-server-1.0.4-RELEASE.jar -console
 <br><br>
 我们可以在Console输入services命令来检查Granite XMPP Server的状态。
 ```
-$services
+$ services
 
 ```
 如果能看到所有的services的状态都是available，说明granite lite server已经被正常的启动了。
@@ -457,7 +457,7 @@ $services
 <br><br>
 可以用plugins命令，来检查可用的plugins。
 ```
-$plugins
+$ plugins
 ```
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_lite_iot_server_console_plugins.png)
 
@@ -489,7 +489,7 @@ sand-demo create-test-users
 <br><br>
 使用exit指令，可以退出Granite Server Console，并关闭Granite XMPP Server。
 ```
-$exit
+$ exit
 ```
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console_exit.png)
 
@@ -508,7 +508,7 @@ $exit
 	<parent>
 		<groupId>com.thefirstlineofcode.sand</groupId>
 		<artifactId>sand-client</artifactId>
-		<version>1.0.0-BETA3</version>
+		<version>1.0.0-BETA4</version>
 	</parent>
 
 	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloactuator</groupId>
@@ -962,7 +962,7 @@ java -jar hello-actuator-thing-0.0.1-RELEASE.jar --host=192.168.1.80
 从头开发一个手机App比较繁琐，我们可以直接用Lithosphere平台提供的sand-demo App来遥控我们的IoT小灯。
 <br><br>
 你可以自己来构建sand-demo App，这是一个标准的Andriod工程，请用Andriod Studio来打开它。[sand-demo App源码](https://github.com/TheFirstLineOfCode/sand/tree/main/demo/app-android)位于sand工程的demo/app-android子目录下。<br><br>
-你可以直接下载构建好的[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA3/sand-demo.apk)安装使用。
+你可以直接下载构建好的[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA4/sand-demo.apk)安装使用。
 <br><br>
 sand-demo App里大部分是常规的Android开发。创建菜单，画界面... ...
 <br><br>

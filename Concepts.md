@@ -138,8 +138,8 @@ Lithosphere在整个平台中，采用了全插件架构。<br><br>
 采用这样的架构实现，主要是因为Lithosphere平台基于XMPP协议。<br><br>
 在XMPP协议中，除了核心协议XMPP Core、XMPP IM之外，其它的所有的协议都被定义在XEPs协议族中。<br><br>
 XEPs定义的协议内容之丰富，从最简单的Ping协议到复杂的协议如多人聊天（MUC）和实时流媒体通讯（Jingle）等。 <br><br>
-XMPP的灵活性，就来这种微内核（XMPP Core、XMPP IM） + 丰富的扩展协议族（XEPs）的协议体系设计上。<br><br>
-遵循XMPP体系的设计原则，Lithosphere在所有可以采用插件架构的地方，使用插件架构，以获得绝对的灵活性和扩展性。
+XMPP的灵活性，就来自这种微内核（XMPP Core、XMPP IM） + 丰富的扩展协议族（XEPs）的协议体系设计上。<br><br>
+遵循XMPP协议体系的设计原则，Lithosphere在所有可以采用插件架构的地方，使用插件架构，以获得绝对的灵活性和扩展性。
 
 <br><br>
 ## 3 IoT

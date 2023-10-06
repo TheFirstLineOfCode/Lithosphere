@@ -7,7 +7,7 @@
 ## 1 前置条件：
 **Java >= 11**<br>
 **Granite Lite IoT XMPP Server**<br>
-点击这里下载[Granite Lite IoT XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/granite-lite-iot-1.0.4-RELEASE.zip)<br>
+点击这里下载[Granite Lite IoT XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.5-RELEASE/granite-lite-iot-1.0.5-RELEASE.zip)<br>
 **Raspberry Pi 3A+硬件板**<br>
 **USB摄像头**<br>
 下图是这个教程中使用到的硬件。
@@ -152,7 +152,7 @@ mvn clean package
 <br><br>
 将hello-webrtc-server插件包，copy到服务器的plugins目录下。
 ```
-cp hello-webrtc-server/target/hello-webrtc-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.4-RELEASE/plugins
+cp hello-webrtc-server/target/hello-webrtc-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.5-RELEASE/plugins
 ```
 <br><br>
 服务器端插件已经开发完成，你可以参考官方开源仓库代码[hello-webrtc-server服务器端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-webrtc/hello-webrtc-server)
@@ -197,7 +197,7 @@ sudo apt-get install default-jdk
 	<parent>
 		<groupId>com.thefirstlineofcode.sand</groupId>
 		<artifactId>sand-client</artifactId>
-		<version>1.0.0-BETA3</version>
+		<version>1.0.0-BETA4</version>
 	</parent>
 
 	<groupId>com.thefirstlineofcode.lithosphere.tutorials.hellowebrtc</groupId>
@@ -402,7 +402,7 @@ Webcam组件依赖封装了WebRTC库的WebRTC Native Service程序，它是一�
 ```
 ssh pi@192.168.1.180
 mkdir WebcamWebrtcNativeService
-wget -O ./WebcamWebrtcNativeService/WebcamWebrtcNativeService https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/WebcamWebrtcNativeService
+wget -O ./WebcamWebrtcNativeService/WebcamWebrtcNativeService https://github.com/TheFirstLineOfCode/sand/releases/tag/1.0.0-BETA4/WebcamWebrtcNativeService
 chmod a+x ./WebcamWebrtcNativeService/WebcamWebrtcNativeService
 ```
 **注：**
@@ -440,7 +440,7 @@ java -jar hello-webrtc-thing-0.0.1-RELEASE.jar --host=192.168.1.80
 从头开发一个手机App比较繁琐，我们可以直接用Lithosphere平台提供的sand-demo App来遥控我们的摄像头设备。
 <br><br>
 你可以自己来构建sand-demo App，这是一个标准的Andriod工程，请用Andriod Studio来打开它。[sand-demo App源码](https://github.com/TheFirstLineOfCode/sand/tree/main/demo/app-android)位于sand工程的demo/app-android子目录下。<br><br>
-你可以直接下载构建好的[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA3/sand-demo.apk)安装使用。
+你可以直接下载构建好的[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA4/sand-demo.apk)安装使用。
 <br><br>
 sand-demo App里大部分是常规的Android开发。创建菜单，画界面... ...
 <br><br>

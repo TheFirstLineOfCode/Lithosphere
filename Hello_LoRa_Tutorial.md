@@ -10,7 +10,7 @@
 ## 1 前置条件：
 **Java >= 11**<br>
 **Granite Lite IoT XMPP Server**<br>
-点击这里下载[Granite Lite IoT XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/granite-lite-iot-1.0.4-RELEASE.zip)<br>
+点击这里下载[Granite Lite IoT XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.5-RELEASE/granite-lite-iot-1.0.5-RELEASE.zip)<br>
 **Raspberry Pi 3A+硬件板**<br>
 **Arduino Micro硬件板**<br>
 **LED模块**<br>
@@ -360,9 +360,9 @@ mvn clean package
 <br><br>
 将hello-lora-server插件包和它依赖的hello-lora-protocol包，把这两个jar包，copy到服务器的plugins目录下。
 ```
-cp hello-lora-protocol/target/hello-lora-protocol-0.0.1-RELEASE.jar granite-lite-iot-1.0.4-RELEASE/plugins
+cp hello-lora-protocol/target/hello-lora-protocol-0.0.1-RELEASE.jar granite-lite-iot-1.0.5-RELEASE/plugins
 
-cp hello-lora-server/target/hello-lora-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.4-RELEASE/plugins
+cp hello-lora-server/target/hello-lora-server-0.0.1-RELEASE.jar granite-lite-iot-1.0.5-RELEASE/plugins
 ```
 <br><br>
 服务器端插件已经开发完成，你可以参考官方开源仓库代码[hello-lora-server服务器端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-lora/hello-lora-server)
@@ -481,7 +481,7 @@ sudo vi /boot/cmdline.txt
 	<parent>
 		<groupId>com.thefirstlineofcode.sand</groupId>
 		<artifactId>sand-client</artifactId>
-		<version>1.0.0-BETA3</version>
+		<version>1.0.0-BETA4</version>
 	</parent>
 
 	<groupId>com.thefirstlineofcode.lithosphere.tutorials.hellolora</groupId>
@@ -879,7 +879,7 @@ sudo java -jar hello-lora-gateway-0.0.1-RELEASE.jar --host=192.168.1.80
 ### 6.4 用App控制网关切换工作模式
 我们还是用sand-demo App来遥控LoRa网关。
 <br><br>
-点击这里下载构建好的[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA3/sand-demo.apk)。
+点击这里下载构建好的[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA4/sand-demo.apk)。
 <br><br>
 使用sand-demo用户登录到sand-demo App里后，我们可以看到型号为HLG的一个设备，它是前面注册成功的LoRa网关设备。<br><br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/change_lora_gateway_working_mode.jpg)
@@ -1173,7 +1173,7 @@ void loop() {
 <br><br>
 #### 8.6.2 注册终端设备
 登录sand-demo App程序。<br><br>
-如果还没有安装sand-demo App，请点击这里下载安装使用[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA3/sand-demo.apk)。<br><br>
+如果还没有安装sand-demo App，请点击这里下载安装使用[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA4/sand-demo.apk)。<br><br>
 
 使用LoRa网关设备的Changing Working Mode菜单，修改网关设备的工作模式为DAC。在DAC工作模式下，终端设备才能通过网关注册到服务器。切换工作模式后，应该能够看到网关控制台有"DAC service has started."信息输出。<br><br>
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/lora_gateway_has_changed_its_working_mode_to_dac.png)
@@ -1221,7 +1221,7 @@ exit
 ### 10.3 重置Granite Lite IoT XMPP Server
 删除掉服务器目录下data子目录，可以重置服务器状态，如下：
 ```
-cd granite-lite-iot-1.0.4-RELEASE
+cd granite-lite-iot-1.0.5-RELEASE
 rm -rf data
 ```
 **注：**

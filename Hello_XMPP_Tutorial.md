@@ -7,13 +7,13 @@
 ## 1 前置条件
 **Java >= 11**<br><br>
 **Granite Lite Mini XMPP Server**<br>
-点击这里下载[Granite Lite Mini XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.4-RELEASE/granite-lite-mini-1.0.4-RELEASE.zip)
+点击这里下载[Granite Lite Mini XMPP Server](https://github.com/TheFirstLineOfCode/granite/releases/download/1.0.5-RELEASE/granite-lite-mini-1.0.5-RELEASE.zip)
 
 <br><br>
 ## 2 检查Granite Lite Mini XMPP Server
 ### 2.1 解压Granite Lite Mini Server
 ```
-unzip granite-lite-mini-1.0.4-RELEASE.zip
+unzip granite-lite-mini-1.0.5-RELEASE.zip
 ```
 
 <br><br>
@@ -40,8 +40,8 @@ domain.name=192.168.1.80
 #### 2.2.2 启动并检查Granite Lite XMPP Server的状态
 启动Granite Lite XMPP Server
 ```
-cd granite-lite-mini-1.0.4
-java -jar granite-server-1.0.4-RELEASE.jar -console
+cd granite-lite-mini-1.0.5
+java -jar granite-server-1.0.5-RELEASE.jar -console
 ```
 带-console参数启动Granite Lite XMPP Server之后，能够看到Granite Server Console的界面。
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console.png)
@@ -49,7 +49,7 @@ java -jar granite-server-1.0.4-RELEASE.jar -console
 <br><br>
 我们可以在Console输入services命令来检查Granite XMPP Server的状态。
 ```
-$services
+$ services
 
 ```
 如果能看到所有的services的状态都是available，说明granite lite server已经被正常的启动了。
@@ -57,7 +57,7 @@ $services
 <br><br>
 可以用plugins命令，来检查可用的plugins。
 ```
-$plugins
+$ plugins
 ```
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_lite_mini_server_console_plugins.png)
 <br><br>
@@ -71,7 +71,7 @@ $plugins
 <br><br>
 我们用exit指令，可以退出Granite Server Console，并关闭Granite XMPP Server。
 ```
-$exit
+$ exit
 ```
 ![](https://dongger-s-img-repo.oss-cn-shenzhen.aliyuncs.com/images/granite_server_console_exit.png)
 
@@ -98,7 +98,7 @@ pom.xml的内容如下：
 	<parent>
 		<groupId>com.thefirstlineofcode.granite</groupId>
 		<artifactId>com.thefirstlineofcode.granite</artifactId>
-		<version>1.0.4-RELEASE</version>
+		<version>1.0.5-RELEASE</version>
 	</parent>
 
 	<groupId>com.thefirstlineofcode.lithosphere.tutorials.helloxmpp</groupId>
@@ -129,7 +129,7 @@ pom.xml的内容如下：
 >>><parent>
 >>>	<groupId>com.thefirstlineofcode.granite</groupId>
 >>>	<artifactId>com.thefirstlineofcode.granite</artifactId>
->>>	<version>1.0.4-RELEASE</version>
+>>>	<version>1.0.5-RELEASE</version>
 >>></parent>
 >>>```
 ><br><br>
@@ -255,15 +255,15 @@ mvn clean package
 #### 3.4.2 部署插件到Granite Lite Server
 将插件包copy到服务器plugins目录下。
 ```
-cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.4/plugins
+cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.5-RELEASE/plugins
 ```
 
 <br><br>
 #### 3.4.3 创建测试用户
 启动Granite Lite XMPP Server
 ```
-cd granite-lite-mini-1.0.4
-java -jar granite-server-1.0.4-RELEASE.jar -console
+cd granite-lite-mini-RELEASE-1.0.5
+java -jar granite-server-lite-1.0.5-RELEASE.jar -console
 ```
 
 <br><br>
@@ -393,8 +393,8 @@ mvn clean package
 <br><br>
 #### 4.3.2 启动Granite Lite Mini Server
 ```
-cd granite-lite-mini-1.0.4-RELEASE
-java -jar granite-server-1.0.4-RELEASE.jar -console
+cd granite-lite-mini-1.0.5-RELEASE
+java -jar granite-server-lite-1.0.5-RELEASE.jar -console
 ```
 
 <br><br>
@@ -694,9 +694,9 @@ mvn clean package
 <br><br>
 将hello-xmpp-server插件包和它依赖的hello-xmpp-protocol包，把这两个jar包，copy到服务器的plugins目录下。
 ```
-cp hello-xmpp-protocol/target/hello-xmpp-protocol-0.0.1-RELEASE.jar granite-lite-mini-1.0.4-RELEASE/plugins
+cp hello-xmpp-protocol/target/hello-xmpp-protocol-0.0.1-RELEASE.jar granite-lite-mini-1.0.5-RELEASE/plugins
 
-cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.4-RELEASE/plugins
+cp hello-xmpp-server/target/hello-xmpp-server-0.0.1-RELEASE.jar granite-lite-mini-1.0.5-RELEASE/plugins
 ```
 
 服务器端插件已经开发完成，你可以参考官方开源仓库代码[hello-xmpp-server服务器端插件包工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-xmpp/hello-xmpp-server)
