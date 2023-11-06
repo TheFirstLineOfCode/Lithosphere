@@ -7,8 +7,8 @@ Lithosphere 作为IoT应用的解决方案，主要有以下的特征：
 * **全栈IoT开发框架**<br> 
 Lithosphere提供全栈的IoT解决方案，包括IoT服务器，LoT局域网网关，到MCU硬件板通讯库，以及移动端开发框架。<br><br>
 Lithosphere采用统一的架构技术和通讯协议，开发者不再需要整合多种开发技术来开发IoT应用，这使得IoT应用的开发变得简单。<br><br>
-* **全插件架构（Plugin-All-Architecture）**<br>
-Lithosphere的核心子项目Chalk，Granite，Sand等，都采用全插件架构设计。采用Lithosphere开发的IoT应用一般会具备以下这些特征：
+* **插件架构（Plugin-Architecture）**<br>
+Lithosphere的核心子项目Chalk，Granite，Sand等，都基于插件架构构建。采用Lithosphere开发的IoT应用一般会具备以下这些特征：
   * 高度模块化
   * 扩展性良好
   * 部署灵活
@@ -20,7 +20,7 @@ Lithosphere的核心子项目Chalk，Granite，Sand等，都采用全插件架�
 <br><br>
 * **基于IoT概念组件编程**<br>
 Lithosphere提供了一组屏蔽了底层通讯细节，封装良好的IoT组件来提高开发效率。<br><br>
-我们可以使用Actuator，Sensor，Concentrator，Gateway，WebCam等组件来做开发，而不需要去研究XMPP、LoRa、WebRTC等具体技术的底层实现细节。
+我们可以使用Actuator，Sensor，Concentrator，Gateway，Webcam等IoT概念组件来做开发，而不需要去研究XMPP、LoRa、WebRTC等具体技术的底层实现细节。
 <br><br>
 ## Lithosphere由以下子项目构成：
 ### [Granite](https://github.com/TheFirstLineOfCode/granite)<br>
@@ -29,16 +29,16 @@ Granite是一个基于Java开发的XMMP Server。Granite XMPP Server具有以下
 * 高度模块化
 * 高可用性和高扩展性
 * 易于扩展和集成  
-Granite基于微内核、插件架构，这使得它非常灵活和易于扩展。
+Granite基于微内核架构（插件架构），这使得它非常灵活和易于扩展。
 <br><br>
 ### [Chalk](https://github.com/TheFirstLineOfCode/chalk)<br>
-Chalk是Java XMPP客户端通讯库，可以用于开发Java桌面和Android的XMPP客户端。Chalk基于插件体系设计，这使得它易于使用及易于扩展。
+Chalk是Java XMPP客户端通讯库，可以用于开发Java桌面和Android的XMPP客户端。Chalk基于插件架构设计，这使得它易于使用及易于扩展。
 <br><br>
 ### [Basalt](https://github.com/TheFirstLineOfCode/basalt)<br>
 Basalt是XMPP的Java解析库。Basalt基于OXM（Object-XMPP Mapping）概念，提供XMPP协议消息包和协议对象（Protocol Object）之间的解析转换功能。
 <br><br>
 ### [Sand](https://github.com/TheFirstLineOfCode/sand)<br>
-Sand项目提供一组封装良好的IoT插件。这些IoT插件基于Chalk（客户端插件）和Granite（服务器端插件）开发。包括：
+Sand项目提供一组封装良好的IoT插件。这些IoT插件基于Chalk技术（客户端插件）和Granite技术（服务器端插件）开发。包括：
 * Actuator<br>
 执行器组件。关于执行器，可以参考概念里的[Actuator](./Concepts.md#Actuator)章节内容。
 <br><br>
@@ -46,7 +46,7 @@ Sand项目提供一组封装良好的IoT插件。这些IoT插件基于Chalk（�
 传感器组件。关于传感器，可以参考概念里的[Sensor](./Concepts.md#Sensor)章节内容。
 <br><br>
 * Edge Thing<br>
-边缘设备组件。Lithosphere里的边缘设备组件。Edge Thing连接到Granite XMPP Server上后，会自动申请注册。一般来说，Gateway，Concentrator等组件，都是Edge Thing。
+边缘设备组件。Lithosphere里的边缘设备组件（Edge Thing）连接到Granite XMPP Server上后，会自动申请注册。一般来说，Gateway，Concentrator等组件，都是Edge Thing。
 <br><br>
 * LoRa Gateway<br>
 封装LoRa协议的网关组件。
