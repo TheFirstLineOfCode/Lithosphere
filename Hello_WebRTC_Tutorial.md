@@ -385,7 +385,7 @@ private void run(String[] args) {
 >>>LogConfigurator.configure(HelloWebrtcThing.THING_MODEL, getLogLevel(logLevel));
 >>>```
 >>>LogConfigurator.configure()方法的两个参数是日志文件名，和配置的LogLevel等级。<br><br>
-以上代码将日志文件保存为${USER_HOME}/.com.thefirstlineofcode.chalk/logs/${MODE_NAME}.yyyy-MM-DD.log。
+以上代码将日志文件保存为${USER_HOME}/.com.thefirstlineofcode.chalk/logs/${MODEL_NAME}.yyyy-MM-DD.log。
 
 <br><br>
 摄像头设备端程序已经开发完成，你可以参考官方开源仓库代码[hello-webrtc-thing设备端程序工程源码](https://github.com/TheFirstLineOfCode/hello-lithosphere-tutorials/tree/main/hello-webrtc/hello-webrtc-thing)
@@ -440,7 +440,7 @@ java -jar hello-webrtc-thing-0.0.1-RELEASE.jar --host=192.168.1.80
 从头开发一个手机App比较繁琐，我们可以直接用Lithosphere平台提供的sand-demo App来遥控我们的摄像头设备。
 <br><br>
 你可以自己来构建sand-demo App，这是一个标准的Andriod工程，请用Andriod Studio来打开它。[sand-demo App源码](https://github.com/TheFirstLineOfCode/sand/tree/main/demo/app-android)位于sand工程的demo/app-android子目录下。<br><br>
-你可以直接下载构建好的[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA4/sand-demo.apk)安装使用。
+你也可以直接下载构建好的[sand-demo App](https://github.com/TheFirstLineOfCode/sand/releases/download/1.0.0-BETA4/sand-demo.apk)安装使用。
 <br><br>
 sand-demo App里大部分是常规的Android开发。创建菜单，画界面... ...
 <br><br>
@@ -464,8 +464,8 @@ webcam插件的使用并不复杂，以下代码，来自sand-demo App源码。
 **代码说明**
 * 拿到需要打开的摄像头设备的Jabber ID。
 >>>```
-String sCameraJid = getIntent().getStringExtra("camera-jid");
-JabberId cameraJid = JabberId.parse(sCameraJid);
+>>>String sCameraJid = getIntent().getStringExtra("camera-jid");
+>>>JabberId cameraJid = JabberId.parse(sCameraJid);
 >>>```
 ><br>
 

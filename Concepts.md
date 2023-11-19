@@ -133,8 +133,8 @@ public interface ICommandsProcessor extends ExtensionPoint {
 
 <br><br>
 ### 2.3 Why Plugin All
-Lithosphere在整个平台中，采用了全插件架构。<br><br>
-为什么叫全插件架构呢？简单的解释就是，内核系统只定义开发框架，不实现任何应用层功能。所有的应用层功能，全部是通过插件来实现的。<br><br>
+Lithosphere在整个平台中，采用了插件（微内核）架构。<br><br>
+什么是插件架构呢？简单的解释就是，内核系统只定义开发框架，不实现任何应用功能。所有的应用层功能，全部是通过插件来实现的。<br><br>
 采用这样的架构实现，主要是因为Lithosphere平台基于XMPP协议。<br><br>
 在XMPP协议中，除了核心协议XMPP Core、XMPP IM之外，其它的所有的协议都被定义在XEPs协议族中。<br><br>
 XEPs定义的协议内容之丰富，从最简单的Ping协议到复杂的协议如多人聊天（MUC）和实时流媒体通讯（Jingle）等。 <br><br>

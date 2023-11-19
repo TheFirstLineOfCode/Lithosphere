@@ -35,7 +35,7 @@ Granite基于微内核架构（插件架构），这使得它非常灵活和易�
 Chalk是Java XMPP客户端通讯库，可以用于开发Java桌面和Android的XMPP客户端。Chalk基于插件架构设计，这使得它易于使用及易于扩展。
 <br><br>
 ### [Basalt](https://github.com/TheFirstLineOfCode/basalt)<br>
-Basalt是XMPP的Java解析库。Basalt基于OXM（Object-XMPP Mapping）概念，提供XMPP协议消息包和协议对象（Protocol Object）之间的解析转换功能。
+Basalt是XMPP的Java解析库。Basalt基于OXM（Protocol Object-XMPP Document Mapping）概念，提供XMPP协议文档和协议对象（Protocol Object）之间的解析转换功能。
 <br><br>
 ### [Sand](https://github.com/TheFirstLineOfCode/sand)<br>
 Sand项目提供一组封装良好的IoT插件。这些IoT插件基于Chalk技术（客户端插件）和Granite技术（服务器端插件）开发。包括：
